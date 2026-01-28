@@ -608,6 +608,59 @@ function cancelarAgendamento(id) {
     }
 }
 
+// ========== VALIDAÇÃO DO BOTÃO CONFIRMAR ==========
+
+// Função que verifica se tudo está preenchido
+function verificarStatusBotao() {
+    // Pegar elementos
+    const nome = document.getElementById('campoNome').value.trim();
+    const telefone = document.getElementById('campoTelefone').value.trim();
+    const servico = document.getElementById('campoServico').value;
+    const data = document.getElementById('campoData').value;
+    const horario = document.getElementById('campoHorario').value;
+    const barbeiroSelecionado = document.querySelector('input[name="barbeiro"]:checked');
+    const botao = document.querySelector('.botao-confirmar');
+
+    // Verificar se todos têm valor
+    const formularioCompleto = nome && telefone && servico && data && horario && barbeiroSelecionado;
+
+    // Ativar ou Desativar botão
+    if (formularioCompleto) {
+        botao.disabled = false;
+        botao.innerHTML = 'Confirmar Agendamento';
+    } else {
+        botao.disabled = true;
+        // Opcional: Mostra o que falta ou apenas deixa bloqueado
+        botao.innerHTML = 'Preencha tudo para confirmar';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const camposTexto = ['campoNome', 'campoTelefone'];
+    camposTexto.forEach(id => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            elemento.addEventListener('input', verificarStatusBotao);
+        }
+    });
+
+    const camposSelecao = ['campoServico', 'campoData', 'campoHorario'];
+    camposSelecao.forEach(id => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            elemento.addEventListener('change', verificarStatusBotao);
+        }
+    });
+
+    const radiosBarbeiro = document.querySelectorAll('input[name="barbeiro"]');
+    radiosBarbeiro.forEach(radio => {
+        radio.addEventListener('change', verificarStatusBotao);
+    });
+
+    verificarStatusBotao();
+});
+
 // ========== FUNÇÃO PARA MIGRAÇÃO FUTURA PARA BANCO DE DADOS ==========
 /*
 QUANDO INTEGRAR COM BANCO DE DADOS, SUBSTITUA ESTAS FUNÇÕES:
