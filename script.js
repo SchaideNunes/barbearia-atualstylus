@@ -5,22 +5,29 @@ let usuarioLogado = false;
 // IMPORTANTE: Altere este número para o WhatsApp da barbearia
 const WHATSAPP_BARBEARIA = '5575988888888'; // Formato: código do país + DDD + número
 
-// ========== CONFIGURAÇÕES PIX ==========
-// IMPORTANTE: Altere para a chave PIX da barbearia
-const CHAVE_PIX = '75988888888'; // Pode ser: telefone, email, CPF, CNPJ ou chave aleatória
-const NOME_FAVORECIDO = 'AtualStylus Barbearia';
-const CIDADE_FAVORECIDO = 'Olindina';
-
 // ========== SISTEMA DE BARBEIROS ==========
 const BARBEIROS = [
     { id: 1, nome: 'Carlos Silva', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
-    { id: 2, nome: 'Roberto Santos', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' },
-    { id: 3, nome: 'Fernando Lima', foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop' }
+    { id: 2, nome: 'Roberto Santos', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' }
 ];
 
-// ========== SISTEMA DE FIDELIDADE ==========
-const CORTES_PARA_DESCONTO = 5; // A cada 5 cortes
-const VALOR_DESCONTO = 10; // R$ 10,00 de desconto
+// ========== SCROLL REVEAL EFFECT ==========
+function revelarNoScroll() {
+    const elementos = document.querySelectorAll('.reveal');
+    
+    elementos.forEach(elemento => {
+        const posicaoElemento = elemento.getBoundingClientRect().top;
+        const alturaJanela = window.innerHeight;
+        
+        if (posicaoElemento < alturaJanela - 100) {
+            elemento.classList.add('active');
+        }
+    });
+}
+
+// Executar ao carregar e ao fazer scroll
+window.addEventListener('scroll', revelarNoScroll);
+window.addEventListener('load', revelarNoScroll);
 
 // ========== AGENDAR SERVIÇO DIRETO ==========
 function agendarServico(nomeServico) {
@@ -61,21 +68,14 @@ const todosHorarios = [
 // FUNÇÃO PARA VERIFICAR HORÁRIOS DISPONÍVEIS POR BARBEIRO
 function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
     if (!barbeiroId) {
-        return todosHorarios; // Retorna todos se não tem barbeiro selecionado
+        return todosHorarios;
     }
     
-    // Buscar todos os agendamentos
     const agendamentos = JSON.parse(localStorage.getItem('agendamentos') || '[]');
-    
-    // Filtrar agendamentos da data E barbeiro selecionado
     const agendamentosDoBarbeiro = agendamentos.filter(ag => 
         ag.data === dataSelecionada && ag.barbeiroId === parseInt(barbeiroId)
     );
-    
-    // Pegar horários já ocupados
     const horariosOcupados = agendamentosDoBarbeiro.map(ag => ag.horario);
-    
-    // Retornar apenas horários disponíveis
     return todosHorarios.filter(horario => !horariosOcupados.includes(horario));
 }
 
@@ -89,7 +89,6 @@ function atualizarHorariosDisponiveis() {
     const barbeiroId = barbeiroRadio ? barbeiroRadio.value : null;
     
     if (!dataSelecionada) {
-        // Se não tem data selecionada, mostrar todos os horários
         campoHorario.innerHTML = '<option value="">Selecione um horário</option>';
         todosHorarios.forEach(horario => {
             const option = document.createElement('option');
@@ -105,13 +104,9 @@ function atualizarHorariosDisponiveis() {
         return;
     }
     
-    // Buscar horários disponíveis
     const horariosDisponiveis = verificarHorariosDisponiveis(dataSelecionada, barbeiroId);
-    
-    // Limpar dropdown
     campoHorario.innerHTML = '<option value="">Selecione um horário</option>';
     
-    // Se não há horários disponíveis
     if (horariosDisponiveis.length === 0) {
         const option = document.createElement('option');
         option.value = '';
@@ -121,7 +116,6 @@ function atualizarHorariosDisponiveis() {
         return;
     }
     
-    // Adicionar horários disponíveis
     horariosDisponiveis.forEach(horario => {
         const option = document.createElement('option');
         option.value = horario;
@@ -130,91 +124,10 @@ function atualizarHorariosDisponiveis() {
     });
 }
 
-// ========== SISTEMA DE FIDELIDADE ==========
-// Verificar quantos cortes o cliente já tem
-function verificarFidelidade(telefone) {
-    const clientes = JSON.parse(localStorage.getItem('clientes_fidelidade') || '{}');
-    return clientes[telefone] || { cortes: 0, descontoDisponivel: false };
-}
-
-// Atualizar fidelidade do cliente
-function atualizarFidelidade(telefone) {
-    const clientes = JSON.parse(localStorage.getItem('clientes_fidelidade') || '{}');
-    
-    if (!clientes[telefone]) {
-        clientes[telefone] = { cortes: 0, descontoDisponivel: false };
-    }
-    
-    clientes[telefone].cortes += 1;
-    
-    // Verificar se ganhou desconto
-    if (clientes[telefone].cortes >= CORTES_PARA_DESCONTO) {
-        clientes[telefone].descontoDisponivel = true;
-        clientes[telefone].cortes = 0; // Resetar contador
-    }
-    
-    localStorage.setItem('clientes_fidelidade', JSON.stringify(clientes));
-    return clientes[telefone];
-}
-
-// Usar desconto da fidelidade
-function usarDescontoFidelidade(telefone) {
-    const clientes = JSON.parse(localStorage.getItem('clientes_fidelidade') || '{}');
-    
-    if (clientes[telefone] && clientes[telefone].descontoDisponivel) {
-        clientes[telefone].descontoDisponivel = false;
-        localStorage.setItem('clientes_fidelidade', JSON.stringify(clientes));
-        return true;
-    }
-    
-    return false;
-}
-
-// Mostrar status de fidelidade
-function mostrarStatusFidelidade(telefone) {
-    const fidelidade = verificarFidelidade(telefone);
-    const statusDiv = document.getElementById('statusFidelidade');
-    
-    if (!statusDiv) return;
-    
-    if (fidelidade.descontoDisponivel) {
-        statusDiv.innerHTML = `
-            <div style="background: #10b981; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;">
-                <p style="color: white; font-weight: bold; margin-bottom: 0.5rem;">
-                    🎉 PARABÉNS! Você tem um desconto disponível!
-                </p>
-                <p style="color: white; font-size: 1.5rem; font-weight: bold;">
-                    R$ ${VALOR_DESCONTO},00 OFF
-                </p>
-                <label style="color: white; display: flex; align-items: center; justify-content: center; margin-top: 0.5rem; cursor: pointer;">
-                    <input type="checkbox" id="usarDesconto" style="margin-right: 0.5rem; width: 20px; height: 20px;">
-                    Usar meu desconto neste agendamento
-                </label>
-            </div>
-        `;
-    } else {
-        const faltam = CORTES_PARA_DESCONTO - fidelidade.cortes;
-        statusDiv.innerHTML = `
-            <div style="background: #374151; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; text-align: center;">
-                <p style="color: #d1d5db; margin-bottom: 0.5rem;">
-                    💳 Programa de Fidelidade
-                </p>
-                <p style="color: #f59e0b; font-weight: bold; font-size: 1.125rem;">
-                    ${fidelidade.cortes} de ${CORTES_PARA_DESCONTO} cortes
-                </p>
-                <p style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem;">
-                    Faltam apenas ${faltam} corte${faltam > 1 ? 's' : ''} para ganhar R$ ${VALOR_DESCONTO},00 OFF!
-                </p>
-            </div>
-        `;
-    }
-}
-
 // ADICIONAR EVENTO DE MUDANÇA NA DATA E BARBEIRO
 document.addEventListener('DOMContentLoaded', function() {
     const campoData = document.getElementById('campoData');
     const barbeiroRadios = document.querySelectorAll('input[name="barbeiro"]');
-    const campoTelefone = document.getElementById('campoTelefone');
     
     if (campoData) {
         campoData.addEventListener('change', atualizarHorariosDisponiveis);
@@ -225,15 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('change', atualizarHorariosDisponiveis);
     });
     
-    // Verificar fidelidade quando preencher telefone
-    if (campoTelefone) {
-        campoTelefone.addEventListener('blur', function() {
-            const telefone = this.value.replace(/\D/g, '');
-            if (telefone.length >= 10) {
-                mostrarStatusFidelidade(telefone);
-            }
-        });
-    }
+    // Inicializar reveal on scroll
+    revelarNoScroll();
 });
 
 // ========== MOSTRAR PÁGINAS ==========
@@ -344,19 +250,7 @@ function confirmarAgendamento() {
 
     // Extrair valor do serviço
     const valorMatch = servico.match(/R\$ (\d+)/);
-    let valor = valorMatch ? parseInt(valorMatch[1]) : 0;
-    
-    // Verificar se vai usar desconto
-    const checkboxDesconto = document.getElementById('usarDesconto');
-    let descontoAplicado = false;
-    
-    if (checkboxDesconto && checkboxDesconto.checked) {
-        const telefoneClean = telefone.replace(/\D/g, '');
-        if (usarDescontoFidelidade(telefoneClean)) {
-            valor = Math.max(0, valor - VALOR_DESCONTO);
-            descontoAplicado = true;
-        }
-    }
+    const valor = valorMatch ? parseInt(valorMatch[1]) : 0;
     
     // Encontrar nome do barbeiro
     const barbeiro = BARBEIROS.find(b => b.id === parseInt(barbeiroId));
@@ -368,8 +262,6 @@ function confirmarAgendamento() {
         telefone: telefone,
         servico: servico,
         valor: valor,
-        valorOriginal: valorMatch ? parseInt(valorMatch[1]) : 0,
-        descontoAplicado: descontoAplicado,
         barbeiroId: parseInt(barbeiroId),
         barbeiroNome: barbeiro ? barbeiro.nome : 'Não especificado',
         data: data,
@@ -383,17 +275,6 @@ function confirmarAgendamento() {
     agendamentos.push(agendamento);
     localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
 
-    // Atualizar fidelidade do cliente (se não usou desconto)
-    if (!descontoAplicado) {
-        const telefoneClean = telefone.replace(/\D/g, '');
-        const novaFidelidade = atualizarFidelidade(telefoneClean);
-        
-        // Informar se ganhou desconto
-        if (novaFidelidade.descontoDisponivel) {
-            alert(`🎉 Parabéns! Você completou ${CORTES_PARA_DESCONTO} cortes e ganhou R$ ${VALOR_DESCONTO},00 de desconto no próximo agendamento!`);
-        }
-    }
-
     // Enviar notificação para WhatsApp da barbearia
     enviarWhatsApp(agendamento);
 
@@ -401,15 +282,10 @@ function confirmarAgendamento() {
     document.getElementById('campoNome').value = '';
     document.getElementById('campoTelefone').value = '';
     document.getElementById('campoServico').value = '';
-    document.querySelector('input[name="barbeiro"]:checked').checked = false;
+    const radioChecked = document.querySelector('input[name="barbeiro"]:checked');
+    if (radioChecked) radioChecked.checked = false;
     document.getElementById('campoData').value = '';
     document.getElementById('campoHorario').innerHTML = '<option value="">Primeiro selecione data e barbeiro</option>';
-    
-    // Limpar status de fidelidade
-    const statusDiv = document.getElementById('statusFidelidade');
-    if (statusDiv) {
-        statusDiv.innerHTML = '';
-    }
 
     alert('✅ Agendamento realizado com sucesso! A barbearia receberá a confirmação via WhatsApp.');
 }
@@ -598,12 +474,6 @@ function enviarWhatsApp(agendamento) {
     // Formatar data
     const dataFormatada = new Date(agendamento.data + 'T00:00:00').toLocaleDateString('pt-BR');
     
-    // Mensagem com ou sem desconto
-    let infoDesconto = '';
-    if (agendamento.descontoAplicado) {
-        infoDesconto = `\n💰 *Desconto Fidelidade:* R$ ${VALOR_DESCONTO},00\n💵 *Valor Original:* R$ ${agendamento.valorOriginal},00`;
-    }
-    
     // Montar mensagem para a BARBEARIA
     const mensagem = `🔔 *NOVO AGENDAMENTO* 🔔
 
@@ -613,7 +483,7 @@ function enviarWhatsApp(agendamento) {
 📅 *Data:* ${dataFormatada}
 🕐 *Horário:* ${agendamento.horario}
 ✂️ *Serviço:* ${agendamento.servico}
-💰 *Valor:* R$ ${agendamento.valor},00${infoDesconto}
+💰 *Valor:* R$ ${agendamento.valor},00
 
 _Agendamento realizado via site_`;
 
@@ -661,11 +531,11 @@ function carregarAgendamentos() {
     // Se não houver agendamentos
     if (agendamentos.length === 0) {
         lista.innerHTML = `
-            <div class="bg-gray-800 rounded-xl p-12 text-center">
-                <svg class="h-20 w-20 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div style="background: #1a1a1a; border-radius: 0.75rem; padding: 3rem; text-align: center; border: 1px solid #333333;">
+                <svg style="height: 5rem; width: 5rem; color: #666; margin: 0 auto 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <p class="text-gray-400 text-xl">Nenhum agendamento ainda</p>
+                <p style="color: #999; font-size: 1.25rem;">Nenhum agendamento ainda</p>
             </div>
         `;
         return;
@@ -682,38 +552,33 @@ function carregarAgendamentos() {
     lista.innerHTML = agendamentos.map(ag => {
         const dataFormatada = new Date(ag.data + 'T00:00:00').toLocaleDateString('pt-BR');
         
-        let infoDesconto = '';
-        if (ag.descontoAplicado) {
-            infoDesconto = `<span class="text-green-400 font-semibold">🎉 Desconto aplicado: -R$ ${VALOR_DESCONTO},00</span>`;
-        }
-        
         return `
-            <div class="cartao-agendamento">
-                <div class="flex flex-col space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xl font-bold text-white">${ag.nome}</h3>
-                        <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                            ✅ Confirmado
-                        </span>
-                    </div>
-                    <div class="flex flex-wrap gap-4 text-gray-300">
-                        <span>📱 ${ag.telefone}</span>
-                        <span>👨‍💼 ${ag.barbeiroNome}</span>
-                        <span>📅 ${dataFormatada}</span>
-                        <span>🕐 ${ag.horario}</span>
-                        <span>💰 R$ ${ag.valor},00</span>
-                    </div>
-                    <p class="text-white font-semibold">${ag.servico}</p>
-                    ${infoDesconto ? `<p>${infoDesconto}</p>` : ''}
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="cancelarAgendamento(${ag.id})" class="botao-cancelar">
-                            Cancelar
-                        </button>
-                    </div>
+            <div class="cartao-agendamento reveal" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <h3 style="font-size: 1.25rem; font-weight: bold; color: white;">${ag.nome}</h3>
+                    <span style="background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">
+                        ✅ Confirmado
+                    </span>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; color: #d1d5db;">
+                    <span>📱 ${ag.telefone}</span>
+                    <span>👨‍💼 ${ag.barbeiroNome}</span>
+                    <span>📅 ${dataFormatada}</span>
+                    <span>🕐 ${ag.horario}</span>
+                    <span>💰 R$ ${ag.valor},00</span>
+                </div>
+                <p style="color: white; font-weight: 600;">${ag.servico}</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <button onclick="cancelarAgendamento(${ag.id})" class="botao-cancelar">
+                        Cancelar
+                    </button>
                 </div>
             </div>
         `;
     }).join('');
+    
+    // Ativar reveal nos novos elementos
+    revelarNoScroll();
 }
 
 // ========== CANCELAR AGENDAMENTO ==========

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AtualStylus Barbearia</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="corpo-site">
@@ -57,46 +56,46 @@
         <!-- PÁGINA INICIAL -->
         <div id="paginaInicio" class="pagina ativa">
             <!-- SEÇÃO HERO COM 2 COLUNAS -->
-            <div class="secao-hero-dividida">
+            <div class="secao-hero-dividida reveal">
                 <!-- COLUNA ESQUERDA - TEXTO -->
-                <div class="coluna-hero-texto">
+                <div class="coluna-hero-texto hover-lift">
                     <div class="conteudo-hero-texto">
                         <div class="container-icone-hero">
-                            <div class="circulo-icone">
+                            <div class="circulo-icone scale-in">
                                 <svg class="icone-tesoura-grande" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
                                 </svg>
                             </div>
                         </div>
-                        <h2 class="titulo-hero">AtualStylus Barbearia</h2>
-                        <p class="subtitulo-hero">
+                        <h2 class="titulo-hero fade-in">AtualStylus Barbearia</h2>
+                        <p class="subtitulo-hero fade-in" style="animation-delay: 0.2s">
                             Estilo e tradição em cada corte. Venha viver a experiência de uma barbearia moderna com atendimento excepcional.
                         </p>
                     </div>
                 </div>
 
                 <!-- COLUNA DIREITA - HORÁRIO E BOTÃO -->
-                <div class="coluna-hero-horario">
+                <div class="coluna-hero-horario hover-lift">
                     <div class="caixa-horario-hero">
-                        <svg class="icone-relogio-hero" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="icone-relogio-hero pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <h3 class="titulo-horario-hero">Horário de Funcionamento</h3>
                         <div class="lista-horarios-hero">
-                            <div class="item-horario-hero">
+                            <div class="item-horario-hero slide-up" style="animation-delay: 0.1s">
                                 <span class="dia-semana-hero">Segunda - Sexta</span>
                                 <span class="hora-funcionamento-hero">09:00 - 18:30</span>
                             </div>
-                            <div class="item-horario-hero">
+                            <div class="item-horario-hero slide-up" style="animation-delay: 0.2s">
                                 <span class="dia-semana-hero">Sábado</span>
                                 <span class="hora-funcionamento-hero">09:00 - 14:00</span>
                             </div>
-                            <div class="item-horario-hero">
+                            <div class="item-horario-hero slide-up" style="animation-delay: 0.3s">
                                 <span class="dia-semana-hero">Domingo</span>
                                 <span class="hora-fechado-hero">Fechado</span>
                             </div>
                         </div>
-                        <button onclick="mostrarPagina('agendamento')" class="botao-agendar-hero">
+                        <button onclick="mostrarPagina('agendamento')" class="botao-agendar-hero slide-up" style="animation-delay: 0.4s">
                             ✂️ Agende Seu Horário
                         </button>
                     </div>
@@ -104,10 +103,10 @@
             </div>
 
             <!-- SEÇÃO SERVIÇOS -->
-            <div class="secao-servicos">
+            <div class="secao-servicos reveal">
                 <h3 class="titulo-secao">Nossos Serviços</h3>
                 <div class="grid-servicos">
-                    <div class="cartao-servico" onclick="agendarServico('Navalhado - R$ 35')">
+                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Navalhado - R$ 35')">
                         <div class="imagem-servico">
                             <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=400&h=300&fit=crop" alt="Corte Navalhado" class="foto-servico">
                         </div>
@@ -115,7 +114,7 @@
                         <p class="preco-servico">R$ 35</p>
                         <p class="descricao-servico">Corte clássico com navalha</p>
                     </div>
-                    <div class="cartao-servico" onclick="agendarServico('Degradê - R$ 40')">
+                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Degradê - R$ 40')" style="transition-delay: 0.1s">
                         <div class="imagem-servico">
                             <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400&h=300&fit=crop" alt="Corte Degradê" class="foto-servico">
                         </div>
@@ -123,7 +122,7 @@
                         <p class="preco-servico">R$ 40</p>
                         <p class="descricao-servico">Degradê moderno e estiloso</p>
                     </div>
-                    <div class="cartao-servico" onclick="agendarServico('Social - R$ 30')">
+                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Social - R$ 30')" style="transition-delay: 0.2s">
                         <div class="imagem-servico">
                             <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400&h=300&fit=crop" alt="Corte Social" class="foto-servico">
                         </div>
@@ -131,7 +130,7 @@
                         <p class="preco-servico">R$ 30</p>
                         <p class="descricao-servico">Corte clássico profissional</p>
                     </div>
-                    <div class="cartao-servico" onclick="agendarServico('Raspado - R$ 25')">
+                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Raspado - R$ 25')" style="transition-delay: 0.3s">
                         <div class="imagem-servico">
                             <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=300&fit=crop" alt="Corte Raspado" class="foto-servico">
                         </div>
@@ -139,7 +138,7 @@
                         <p class="preco-servico">R$ 25</p>
                         <p class="descricao-servico">Raspado completo ou parcial</p>
                     </div>
-                    <div class="cartao-servico" onclick="agendarServico('Barba - R$ 25')">
+                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Barba - R$ 25')" style="transition-delay: 0.4s">
                         <div class="imagem-servico">
                             <img src="https://images.unsplash.com/photo-1621607512214-68297480165e?w=400&h=300&fit=crop" alt="Barba" class="foto-servico">
                         </div>
@@ -147,7 +146,7 @@
                         <p class="preco-servico">R$ 25</p>
                         <p class="descricao-servico">Aparar e modelar a barba</p>
                     </div>
-                    <div class="cartao-servico" onclick="agendarServico('Corte + Barba - R$ 50')">
+                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Corte + Barba - R$ 50')" style="transition-delay: 0.5s">
                         <div class="imagem-servico">
                             <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&h=300&fit=crop" alt="Corte + Barba" class="foto-servico">
                         </div>
@@ -155,7 +154,7 @@
                         <p class="preco-servico">R$ 50</p>
                         <p class="descricao-servico">Combo completo</p>
                     </div>
-                    <div class="cartao-servico" onclick="agendarServico('Sobrancelha - R$ 15')">
+                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Sobrancelha - R$ 15')" style="transition-delay: 0.6s">
                         <div class="imagem-servico">
                             <img src="https://images.unsplash.com/photo-1587904862716-b5c6ac1d6d43?w=400&h=300&fit=crop" alt="Sobrancelha" class="foto-servico">
                         </div>
@@ -163,7 +162,7 @@
                         <p class="preco-servico">R$ 15</p>
                         <p class="descricao-servico">Design de sobrancelha</p>
                     </div>
-                    <div class="cartao-servico" onclick="agendarServico('Pacote Completo - R$ 65')">
+                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Pacote Completo - R$ 65')" style="transition-delay: 0.7s">
                         <div class="imagem-servico">
                             <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=400&h=300&fit=crop" alt="Pacote Completo" class="foto-servico">
                         </div>
@@ -174,8 +173,8 @@
                 </div>
                 
                 <!-- BOTÃO DE AGENDAMENTO NO FINAL DOS SERVIÇOS -->
-                <div class="container-botao-servicos">
-                    <button onclick="mostrarPagina('agendamento')" class="botao-agendar-servicos">
+                <div class="container-botao-servicos reveal">
+                    <button onclick="mostrarPagina('agendamento')" class="botao-agendar-servicos pulse">
                         ✂️ Agendar Agora
                     </button>
                 </div>
@@ -184,25 +183,21 @@
 
         <!-- PÁGINA AGENDAMENTO -->
         <div id="paginaAgendamento" class="pagina">
-            <div class="container-agendamento">
+            <div class="container-agendamento fade-in">
                 <h2 class="titulo-agendamento">Agende seu Horário</h2>
                 
-                <!-- STATUS DE FIDELIDADE -->
-                <div id="statusFidelidade"></div>
-                
                 <div class="formulario-agendamento">
-                    <div class="campo-formulario">
+                    <div class="campo-formulario slide-up">
                         <label class="label-campo">Nome Completo</label>
                         <input type="text" id="campoNome" class="input-campo" placeholder="Seu nome">
                     </div>
 
-                    <div class="campo-formulario">
+                    <div class="campo-formulario slide-up" style="animation-delay: 0.1s">
                         <label class="label-campo">WhatsApp</label>
                         <input type="tel" id="campoTelefone" class="input-campo" placeholder="(00) 00000-0000">
-                        <p class="texto-info-fidelidade">💡 Seu número é usado para o programa de fidelidade</p>
                     </div>
 
-                    <div class="campo-formulario">
+                    <div class="campo-formulario slide-up" style="animation-delay: 0.2s">
                         <label class="label-campo">Escolha seu Barbeiro</label>
                         <div class="grid-barbeiros">
                             <label class="cartao-barbeiro">
@@ -219,17 +214,10 @@
                                     <p class="nome-barbeiro-card">Roberto Santos</p>
                                 </div>
                             </label>
-                            <label class="cartao-barbeiro">
-                                <input type="radio" name="barbeiro" value="3" class="input-radio-barbeiro">
-                                <div class="conteudo-barbeiro">
-                                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop" alt="Fernando Lima" class="foto-barbeiro">
-                                    <p class="nome-barbeiro-card">Fernando Lima</p>
-                                </div>
-                            </label>
                         </div>
                     </div>
 
-                    <div class="campo-formulario">
+                    <div class="campo-formulario slide-up" style="animation-delay: 0.3s">
                         <label class="label-campo">Serviço</label>
                         <select id="campoServico" class="select-campo">
                             <option value="">Selecione um serviço</option>
@@ -244,12 +232,12 @@
                         </select>
                     </div>
 
-                    <div class="campo-formulario">
+                    <div class="campo-formulario slide-up" style="animation-delay: 0.4s">
                         <label class="label-campo">Data</label>
                         <input type="date" id="campoData" class="input-campo">
                     </div>
 
-                    <div class="campo-formulario">
+                    <div class="campo-formulario slide-up" style="animation-delay: 0.5s">
                         <label class="label-campo">Horário</label>
                         <select id="campoHorario" class="select-campo">
                             <option value="">Primeiro selecione data e barbeiro</option>
@@ -257,7 +245,7 @@
                         <p class="texto-info-horario">Os horários disponíveis variam por barbeiro</p>
                     </div>
 
-                    <button onclick="confirmarAgendamento()" class="botao-confirmar">
+                    <button onclick="confirmarAgendamento()" class="botao-confirmar slide-up" style="animation-delay: 0.6s">
                         Confirmar Agendamento
                     </button>
                 </div>
