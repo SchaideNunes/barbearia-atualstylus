@@ -522,3 +522,17 @@ html {
         transform: scale(0.98);
     }
 }
+
+@media (max-width: 767px) {
+    .secao-hero-dividida {
+        display: flex; /* Muda de Grid para Flexbox no celular */
+        flex-direction: column-reverse; /* O PULO DO GATO: Inverte a ordem dos itens */
+        gap: 1.5rem;
+    }
+
+    /* Opcional: Um ajuste fino para garantir que as caixas fiquem bonitas empilhadas */
+    .coluna-hero-texto, 
+    .coluna-hero-horario {
+        width: 100%;
+    }
+}
