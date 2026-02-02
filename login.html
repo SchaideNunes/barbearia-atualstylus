@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-black flex items-center justify-center h-screen">
+
+    <div class="bg-gray-900 p-8 rounded-lg border border-gray-800 w-full max-w-sm">
+        <h2 class="text-2xl font-bold text-white mb-6 text-center">Acesso Restrito</h2>
+        
+        <input type="email" id="email" placeholder="Email" class="w-full mb-4 p-3 bg-gray-800 text-white rounded border border-gray-700">
+        <input type="password" id="senha" placeholder="Senha" class="w-full mb-6 p-3 bg-gray-800 text-white rounded border border-gray-700">
+        
+        <button onclick="fazerLogin()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded transition">
+            Entrar
+        </button>
+        <p id="msgErro" class="text-red-500 text-center mt-4 hidden"></p>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'SUA_URL_DO_SUPABASE';
+        const SUPABASE_KEY = 'SUA_CHAVE_ANONIMA';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function fazerLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('senha').value;
+            const msgErro = document.getElementById('msgErro');
+
+            // Autenticação Real no Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                msgErro.textContent = "Email ou senha incorretos";
+                msgErro.classList.remove('hidden');
+            } else {
+                // Sucesso! Vai para o painel admin
+                window.location.href = 'admin.html';
+            }
+        }
+    </script>
+</body>
+</html>

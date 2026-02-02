@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - AtualStylus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background-color: #111; color: white; font-family: sans-serif; }
+    </style>
+</head>
+<body>
+    <div class="max-w-4xl mx-auto p-4">
+        <div class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
+            <h1 class="text-2xl font-bold text-white">Painel Administrativo</h1>
+            <button onclick="sair()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                Sair
+            </button>
+        </div>
+
+        <div id="listaAgendamentos" class="space-y-4">
+            <p>Carregando dados seguros...</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Configurar Supabase (use suas chaves reais aqui)
+        const SUPABASE_URL = 'SUA_URL_DO_SUPABASE';
+        const SUPABASE_KEY = 'SUA_CHAVE_ANONIMA';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // 2. O GUARDIÃO (Verificação de Segurança)
+        async function verificarAcesso() {
+            // Pergunta ao Supabase: "Tem alguém logado?"
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                // Se não tem sessão, manda para o login imediatamente
+                window.location.href = 'login.html';
+            } else {
+                // Se tem sessão, carrega os dados
+                carregarAgendamentos();
+            }
+        }
+
+        // 3. Função de Sair
+        async function sair() {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        }
+
+        // 4. Carregar Agendamentos (Sua lógica de banco de dados entra aqui)
+        async function carregarAgendamentos() {
+            const lista = document.getElementById('listaAgendamentos');
+            
+            // Busca dados reais do banco
+            const { data: agendamentos, error } = await supabase
+                .from('agendamentos')
+                .select('*')
+                .order('data_agendamento', { ascending: true });
+            
+            if(error) {
+                lista.innerHTML = '<p class="text-red-500">Erro ao carregar</p>';
+                return;
+            }
+
+            // Renderiza (Exemplo simplificado)
+            lista.innerHTML = agendamentos.map(ag => `
+                <div class="bg-gray-800 p-4 rounded border border-gray-700">
+                    <strong class="text-xl">${ag.nome}</strong> - ${ag.servico}<br>
+                    <span class="text-gray-400">${ag.data_agendamento} às ${ag.horario}</span>
+                </div>
+            `).join('');
+        }
+
+        // Executa a verificação assim que a página abre
+        verificarAcesso();
+    </script>
+</body>
+</html>

@@ -1,6 +1,3 @@
-/* =========================================
-   1. RESET E CONFIGURAÇÕES GERAIS
-   ========================================= */
 * {
     margin: 0;
     padding: 0;
@@ -13,14 +10,15 @@ body {
     color: #e5e5e5;
     min-height: 100vh;
 }
-    select {
-  min-height: 40px; 
-  padding: 10px; 
-  font-size: 16px; 
-  box-sizing: border-box;
--webkit-appearance: none;
--moz-appearance: none;
-appearance: none;
+
+select {
+    min-height: 40px; 
+    padding: 10px; 
+    font-size: 16px; 
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 select, input {
@@ -43,9 +41,7 @@ html {
     scroll-behavior: smooth;
 }
 
-/* =========================================
-   2. ANIMAÇÕES E EFEITOS (PRESERVADOS DO ORIGINAL)
-   ========================================= */
+/*2. ANIMAÇÕES E EFEITOS*/
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -91,9 +87,7 @@ html {
     50% { background-position: 100% center; }
 }
 
-/* =========================================
-   3. SISTEMA DE PÁGINAS (SPA)
-   ========================================= */
+/*3. SISTEMA DE PÁGINAS*/
 .pagina {
     display: none;
     opacity: 0;
@@ -105,9 +99,7 @@ html {
     opacity: 1;
 }
 
-/* =========================================
-   4. CABEÇALHO E NAVEGAÇÃO
-   ========================================= */
+/*4. CABEÇALHO E NAVEGAÇÃO*/
 .cabecalho {
     background-color: #000000;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -132,7 +124,14 @@ html {
 
 /* Logo */
 .logo { display: flex; align-items: center; gap: 0.75rem; }
-.icone-logo { height: 2rem; width: 2rem; color: #ffffff; }
+
+/* NOVO: Estilo das imagens da logo */
+.imagem-logo-cabecalho {
+    height: 3rem; /* Tamanho proporcional ao cabeçalho */
+    width: auto;
+    object-fit: contain;
+}
+
 .nome-logo { font-size: 1.5rem; font-weight: bold; color: white; }
 
 /* Menu Mobile Botões */
@@ -167,18 +166,14 @@ html {
 .item-menu-mobile-sair { color: #f87171; }
 .item-menu-mobile-sair:hover { background-color: #1f2937; }
 
-/* =========================================
-   5. CONTEÚDO PRINCIPAL
-   ========================================= */
+/*5. CONTEÚDO PRINCIPAL*/
 .conteudo-principal {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 3rem 1rem 1rem 1rem; /* Padding inferior ajustado */
+    padding: 3rem 1rem 1rem 1rem; 
 }
 
-/* =========================================
-   6. PÁGINA INICIAL (HERO)
-   ========================================= */
+/*6. PÁGINA INICIAL (HERO)*/
 .secao-hero-dividida {
     display: grid;
     grid-template-columns: 1fr;
@@ -193,8 +188,22 @@ html {
 }
 .conteudo-hero-texto { text-align: center; width: 100%; }
 .container-icone-hero { display: flex; justify-content: center; margin-bottom: 1.5rem; }
-.circulo-icone { background-color: #ffffff; padding: 1.5rem; border-radius: 9999px; }
-.icone-tesoura-grande { height: 5rem; width: 5rem; color: #000000; }
+
+/* Círculo que envolve a logo na Hero */
+.circulo-icone { 
+    background-color: transparent; /* Removido fundo branco para destacar o PNG transparente */
+    padding: 0.5rem; 
+    border-radius: 9999px; 
+}
+
+/* Estilo da Logo Principal (Hero) */
+.imagem-logo-hero {
+    height: 12rem; /* Tamanho grande para destaque */
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0px 0px 8px rgba(255,255,255,0.2));
+}
+
 .titulo-hero { font-size: 3rem; font-weight: bold; color: white; margin-bottom: 1.5rem; }
 .subtitulo-hero { font-size: 1.125rem; color: #d1d5db; line-height: 1.75; }
 
@@ -222,14 +231,12 @@ html {
 }
 .botao-agendar-hero:hover { background-color: #e5e5e5; transform: scale(1.05); }
 
-/* =========================================
-   7. SEÇÃO SERVIÇOS (COM CORREÇÃO DE ESPAÇAMENTO)
-   ========================================= */
+/*7. SEÇÃO SERVIÇOS*/
 .secao-servicos {
     background-color: #1a1a1a;
     border-radius: 0.75rem;
     padding: 2rem;
-    margin-bottom: 1rem; /* CORREÇÃO: Margem reduzida para aproximar do footer */
+    margin-bottom: 1rem; 
     border: 1px solid #333333;
 }
 
@@ -267,9 +274,7 @@ html {
     box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
 }
 
-/* =========================================
-   8. PÁGINA AGENDAMENTO (NOVO DESIGN PREMIUM)
-   ========================================= */
+/*8. PÁGINA AGENDAMENTO*/
 .container-agendamento {
     max-width: 42rem; margin: 0 auto; background-color: #1a1a1a;
     border-radius: 1rem; padding: 2.5rem; border: 1px solid #333333;
@@ -300,7 +305,7 @@ html {
     background-color: #171717; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
 }
 
-/* NOVO: Grid de 2 Barbeiros (Cards) */
+/* Grid de 2 Barbeiros (Cards) */
 .grid-barbeiros {
     display: grid; grid-template-columns: 1fr 1fr; /* 2 Colunas */
     gap: 1.5rem; margin-top: 0.5rem;
@@ -322,9 +327,6 @@ html {
 }
 .nome-barbeiro-card { color: #d1d5db; font-weight: 600; font-size: 1rem; text-align: center; }
 
-/* Efeito Hover */
-.cartao-barbeiro:hover .conteudo-barbeiro { border-color: #525252; transform: translateY(-2px); }
-
 /* Estado Selecionado */
 .input-radio-barbeiro:checked + .conteudo-barbeiro {
     border-color: #f59e0b; background-color: rgba(245, 158, 11, 0.05);
@@ -345,14 +347,12 @@ html {
     box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
 }
 
-.texto-info-fidelidade, .texto-info-horario {
+.texto-info-horario {
     color: #9ca3af; font-size: 0.85rem; margin-top: 0.5rem;
     display: flex; align-items: center; gap: 0.5rem;
 }
 
-/* =========================================
-   9. OUTRAS PÁGINAS (SOBRE, LOGIN, ADMIN)
-   ========================================= */
+/*9. OUTRAS PÁGINAS (SOBRE, LOGIN, ADMIN)*/
 /* Página Sobre */
 .container-sobre { max-width: 56rem; margin: 0 auto; }
 .caixa-sobre {
@@ -396,18 +396,11 @@ html {
     transition: background-color 0.3s; margin-bottom: 1rem; border: 1px solid #333333;
 }
 .cartao-agendamento:hover { background-color: #2a2a2a; }
-.botao-cancelar {
-    background-color: #ef4444; color: white; padding: 0.5rem 1.5rem;
-    border-radius: 0.5rem; border: none; cursor: pointer; white-space: nowrap; transition: background-color 0.3s;
-}
-.botao-cancelar:hover { background-color: #dc2626; }
 
-/* =========================================
-   10. RODAPÉ (COM CORREÇÃO DE ESPAÇAMENTO)
-   ========================================= */
+/*10. RODAPÉ*/
 .rodape {
     background-color: #000000;
-    margin-top: 0; /* CORREÇÃO: Margem removida */
+    margin-top: 0; 
     padding: 3rem 0;
 }
 
@@ -445,9 +438,7 @@ html {
 /* Utilitários */
 .hidden { display: none; }
 
-/* =========================================
-   11. RESPONSIVO
-   ========================================= */
+/*11. RESPONSIVO*/
 @media (min-width: 768px) {
     .botao-menu-mobile { display: none; }
     .menu-desktop { display: flex; }
@@ -469,32 +460,14 @@ html {
     .container-agendamento { padding: 1.5rem; }
     .grid-barbeiros { gap: 0.75rem; }
     .foto-barbeiro { width: 60px; height: 60px; }
+    .imagem-logo-hero { height: 8rem; }
 }
 
-/* Efeito de Botão Desativado */
-.botao-confirmar:disabled {
-    background-color: #404040;
-    color: #a3a3a3;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
-    opacity: 0.7;
-}
-
-.botao-confirmar:disabled:hover {
-    background-color: #404040;
-    transform: none;
-}
-
-/* =========================================
-   AJUSTES ESPECÍFICOS PARA O BOTÃO CANCELAR (ADMIN)
-   ========================================= */
-
-/* Ajuste padrão (Desktop) - Um pouco maior para melhor visibilidade */
+/* Botão Cancelar Admin */
 .botao-cancelar {
     background-color: #ef4444;
     color: white;
-    padding: 0.75rem 1.5rem; /* Aumentado levemente */
+    padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
     border: none;
     cursor: pointer;
@@ -507,32 +480,10 @@ html {
     background-color: #dc2626;
 }
 
-/* Ajuste Mobile (Celulares) */
-@media (max-width: 480px) {
-    .botao-cancelar {
-        width: 100%;
-        padding: 1rem;
-        font-size: 1.1rem;
-        margin-top: 0.5rem;
-        border: 2px solid #ffffff; 
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    }
-    .botao-cancelar:active {
-        background-color: #b91c1c;
-        transform: scale(0.98);
-    }
-}
-
 @media (max-width: 767px) {
     .secao-hero-dividida {
-        display: flex; /* Muda de Grid para Flexbox no celular */
-        flex-direction: column-reverse; /* O PULO DO GATO: Inverte a ordem dos itens */
+        display: flex;
+        flex-direction: column-reverse;
         gap: 1.5rem;
-    }
-
-    /* Opcional: Um ajuste fino para garantir que as caixas fiquem bonitas empilhadas */
-    .coluna-hero-texto, 
-    .coluna-hero-horario {
-        width: 100%;
     }
 }
