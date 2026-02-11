@@ -25,57 +25,117 @@
     </div>
 
     <script>
-        // 1. Configurar Supabase (use suas chaves reais aqui)
-        const SUPABASE_URL = 'SUA_URL_DO_SUPABASE';
-        const SUPABASE_KEY = 'SUA_CHAVE_ANONIMA';
+
+        const SUPABASE_URL = 'https://tnltiicshevuxkjsnkmm.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHRpaWNzaGV2dXhranNua21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQwMzQsImV4cCI6MjA4NjQyMDAzNH0.7otLzZqWwzV1PUQCxrC9k-Y-KZ--QrQVVYllZKSFans';
+        
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 2. O GUARDIÃO (Verificação de Segurança)
-        async function verificarAcesso() {
-            // Pergunta ao Supabase: "Tem alguém logado?"
-            const { data: { session } } = await supabase.auth.getSession();
+        async function iniciarAdmin() {
+            const lista = document.getElementById('listaAgendamentos');
 
-            if (!session) {
-                // Se não tem sessão, manda para o login imediatamente
-                window.location.href = 'login.html';
-            } else {
-                // Se tem sessão, carrega os dados
-                carregarAgendamentos();
+            try {
+
+                const { data: { session }, error: authError } = await supabase.auth.getSession();
+
+                if (authError || !session) {
+
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const { data: agendamentos, error: dbError } = await supabase
+                    .from('agendamentos')
+                    .select('*')
+                    .order('data_agendamento', { ascending: true });
+
+                if (dbError) {
+                    console.error('Erro Supabase:', dbError);
+                    lista.innerHTML = `
+                        <div class="bg-red-900 text-white p-4 rounded border border-red-500">
+                            <strong>Erro ao carregar dados:</strong><br>
+                            ${dbError.message}<br>
+                            <small>Verifique o Console (F12) para mais detalhes.</small>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!agendamentos || agendamentos.length === 0) {
+                    lista.innerHTML = `
+                        <div class="text-center py-10 text-gray-400">
+                            <p class="text-xl">📭 Nenhum agendamento encontrado.</p>
+                            <p class="text-sm mt-2">O banco de dados está conectado, mas vazio.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                lista.innerHTML = agendamentos.map(ag => {
+
+                    const dataBR = new Date(ag.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR');
+                    
+                    return `
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg mb-4 hover:border-yellow-500 transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-yellow-500">${ag.nome}</h3>
+                                <p class="text-gray-400 text-sm">${ag.servico}</p>
+                            </div>
+                            <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded-full uppercase font-bold tracking-wide">
+                                ${ag.status || 'Confirmado'}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-sm text-gray-300 mb-4">
+                            <div class="flex items-center gap-2">
+                                <span>📅 ${dataBR}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span>⏰ ${ag.horario}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span>📱 ${ag.telefone}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span>✂️ ${ag.barbeiro_nome || 'Barbeiro'}</span>
+                            </div>
+                        </div>
+
+                        <button onclick="deletarAgendamento(${ag.id})" class="w-full bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white border border-red-600 py-2 rounded transition duration-200 flex items-center justify-center gap-2">
+                            🗑️ Cancelar Agendamento
+                        </button>
+                    </div>
+                `}).join('');
+
+            } catch (err) {
+                console.error('Erro Crítico:', err);
+                lista.innerHTML = `<p class="text-red-500">Erro crítico no Javascript: ${err.message}</p>`;
             }
         }
 
-        // 3. Função de Sair
+        async function deletarAgendamento(id) {
+            if(!confirm("Tem certeza que deseja excluir este agendamento?")) return;
+
+            const { error } = await supabase
+                .from('agendamentos')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Erro ao deletar: ' + error.message);
+            } else {
+                alert('Agendamento removido!');
+                iniciarAdmin();
+            }
+        }
+
         async function sair() {
             await supabase.auth.signOut();
             window.location.href = 'login.html';
         }
 
-        // 4. Carregar Agendamentos (Sua lógica de banco de dados entra aqui)
-        async function carregarAgendamentos() {
-            const lista = document.getElementById('listaAgendamentos');
-            
-            // Busca dados reais do banco
-            const { data: agendamentos, error } = await supabase
-                .from('agendamentos')
-                .select('*')
-                .order('data_agendamento', { ascending: true });
-            
-            if(error) {
-                lista.innerHTML = '<p class="text-red-500">Erro ao carregar</p>';
-                return;
-            }
-
-            // Renderiza (Exemplo simplificado)
-            lista.innerHTML = agendamentos.map(ag => `
-                <div class="bg-gray-800 p-4 rounded border border-gray-700">
-                    <strong class="text-xl">${ag.nome}</strong> - ${ag.servico}<br>
-                    <span class="text-gray-400">${ag.data_agendamento} às ${ag.horario}</span>
-                </div>
-            `).join('');
-        }
-
-        // Executa a verificação assim que a página abre
-        verificarAcesso();
+        iniciarAdmin();
     </script>
 </body>
 </html>
