@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -12,9 +13,9 @@ body {
 }
 
 select {
-    min-height: 40px; 
-    padding: 10px; 
-    font-size: 16px; 
+    min-height: 40px;
+    padding: 10px;
+    font-size: 16px;
     box-sizing: border-box;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -25,7 +26,6 @@ select, input {
     color-scheme: dark;
 }
 
-/* Sobrescrever estilos do Tailwind / Inputs Globais */
 .input-campo:focus,
 .select-campo:focus {
     outline: 2px solid #ffffff;
@@ -36,12 +36,10 @@ select, input {
     color: #6b7280;
 }
 
-/* Smooth Scroll */
 html {
     scroll-behavior: smooth;
 }
 
-/*2. ANIMAÇÕES E EFEITOS*/
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -74,7 +72,6 @@ html {
 .reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
 .reveal.active { opacity: 1; transform: translateY(0); }
 
-/* Texto Gradiente Animado */
 .gradient-text {
     background: linear-gradient(90deg, #ffffff, #cccccc, #ffffff);
     background-size: 200% auto;
@@ -87,7 +84,6 @@ html {
     50% { background-position: 100% center; }
 }
 
-/*3. SISTEMA DE PÁGINAS*/
 .pagina {
     display: none;
     opacity: 0;
@@ -99,7 +95,6 @@ html {
     opacity: 1;
 }
 
-/*4. CABEÇALHO E NAVEGAÇÃO*/
 .cabecalho {
     background-color: #000000;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -122,23 +117,19 @@ html {
     padding: 1rem 0;
 }
 
-/* Logo */
 .logo { display: flex; align-items: center; gap: 0.75rem; }
 
-/* NOVO: Estilo das imagens da logo */
 .imagem-logo-cabecalho {
-    height: 3rem; /* Tamanho proporcional ao cabeçalho */
+    height: 3rem;
     width: auto;
     object-fit: contain;
 }
 
 .nome-logo { font-size: 1.5rem; font-weight: bold; color: white; }
 
-/* Menu Mobile Botões */
 .botao-menu-mobile { display: block; color: white; background: none; border: none; cursor: pointer; }
 .icone-hamburguer, .icone-fechar { height: 1.5rem; width: 1.5rem; }
 
-/* Menu Desktop */
 .menu-desktop { display: none; gap: 1.5rem; }
 
 .link-menu, .link-menu-sair {
@@ -152,7 +143,6 @@ html {
 .link-menu-sair { color: #f87171; }
 .link-menu-sair:hover { color: #fca5a5; }
 
-/* Menu Mobile Lista */
 .menu-mobile { padding-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
 
 .item-menu-mobile, .item-menu-mobile-sair {
@@ -166,14 +156,12 @@ html {
 .item-menu-mobile-sair { color: #f87171; }
 .item-menu-mobile-sair:hover { background-color: #1f2937; }
 
-/*5. CONTEÚDO PRINCIPAL*/
 .conteudo-principal {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 3rem 1rem 1rem 1rem; 
+    padding: 3rem 1rem 1rem 1rem;
 }
 
-/*6. PÁGINA INICIAL (HERO)*/
 .secao-hero-dividida {
     display: grid;
     grid-template-columns: 1fr;
@@ -181,36 +169,42 @@ html {
     margin-bottom: 4rem;
 }
 
-/* Coluna Texto */
 .coluna-hero-texto {
-    background-color: #1a1a1a; border-radius: 0.75rem; padding: 3rem;
-    border: 1px solid #333333; display: flex; align-items: center; justify-content: center;
+    background-color: #1a1a1a;
+    border-radius: 0.75rem;
+    padding: 3rem;
+    border: 1px solid #333333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .conteudo-hero-texto { text-align: center; width: 100%; }
 .container-icone-hero { display: flex; justify-content: center; margin-bottom: 1.5rem; }
 
-/* Círculo que envolve a logo na Hero */
-.circulo-icone { 
-    background-color: transparent; /* Removido fundo branco para destacar o PNG transparente */
-    padding: 0.5rem; 
-    border-radius: 9999px; 
+.circulo-icone {
+    background-color: transparent;
+    padding: 0.5rem;
+    border-radius: 9999px;
 }
 
-/* Estilo da Logo Principal (Hero) */
 .imagem-logo-hero {
-    height: 12rem; /* Tamanho grande para destaque */
+    height: 12rem;
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0px 0px 8px rgba(255,255,255,0.2));
+    filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.2));
 }
 
 .titulo-hero { font-size: 3rem; font-weight: bold; color: white; margin-bottom: 1.5rem; }
 .subtitulo-hero { font-size: 1.125rem; color: #d1d5db; line-height: 1.75; }
 
-/* Coluna Horário */
 .coluna-hero-horario {
-    background-color: #1a1a1a; border-radius: 0.75rem; padding: 3rem;
-    border: 1px solid #333333; display: flex; align-items: center; justify-content: center;
+    background-color: #1a1a1a;
+    border-radius: 0.75rem;
+    padding: 3rem;
+    border: 1px solid #333333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .caixa-horario-hero { width: 100%; text-align: center; }
 .icone-relogio-hero { height: 4rem; width: 4rem; color: #ffffff; margin: 0 auto 1.5rem; }
@@ -231,31 +225,55 @@ html {
 }
 .botao-agendar-hero:hover { background-color: #e5e5e5; transform: scale(1.05); }
 
-/*7. SEÇÃO SERVIÇOS*/
 .secao-servicos {
     background-color: #1a1a1a;
     border-radius: 0.75rem;
     padding: 2rem;
-    margin-bottom: 1rem; 
+    margin-bottom: 1rem;
     border: 1px solid #333333;
 }
 
 .titulo-secao { font-size: 1.875rem; font-weight: bold; color: white; text-align: center; margin-bottom: 2rem; }
-
 .grid-servicos { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
 
 .cartao-servico {
-    background-color: #1a1a1a; border-radius: 0.5rem; overflow: hidden;
-    cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    background-color: #1a1a1a;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    cursor: pointer;
+
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease, border-color 0.15s ease-in;
+    
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     border: 2px solid #333333;
-}
-.cartao-servico:hover {
-    background-color: #2a2a2a; transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1); border-color: #ffffff;
+    
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
-.imagem-servico { width: 100%; height: 200px; overflow: hidden; position: relative; }
-.foto-servico { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+.cartao-servico:hover {
+    background-color: #2a2a2a;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+}
+
+.imagem-servico {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+.foto-servico {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+}
+
 .cartao-servico:hover .foto-servico { transform: scale(1.1); }
 
 .nome-servico { font-size: 1.25rem; font-weight: 600; color: white; margin: 1rem 1.5rem 0.5rem 1.5rem; }
@@ -274,10 +292,13 @@ html {
     box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
 }
 
-/*8. PÁGINA AGENDAMENTO*/
 .container-agendamento {
-    max-width: 42rem; margin: 0 auto; background-color: #1a1a1a;
-    border-radius: 1rem; padding: 2.5rem; border: 1px solid #333333;
+    max-width: 42rem;
+    margin: 0 auto;
+    background-color: #1a1a1a;
+    border-radius: 1rem;
+    padding: 2.5rem;
+    border: 1px solid #333333;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
@@ -287,32 +308,28 @@ html {
 }
 
 .formulario-agendamento { display: flex; flex-direction: column; gap: 1.5rem; }
-
 .campo-formulario { display: flex; flex-direction: column; }
 .label-campo {
     display: block; color: #e5e7eb; margin-bottom: 0.5rem;
     font-size: 0.95rem; font-weight: 600; margin-left: 0.2rem;
 }
 
-/* Inputs Modernos */
 .input-campo, .select-campo {
     width: 100%; padding: 1rem; background-color: #262626; color: white;
     border-radius: 0.75rem; border: 2px solid #333333; outline: none;
     transition: all 0.3s ease; font-size: 1rem;
 }
 .input-campo:focus, .select-campo:focus {
-    border-color: #f59e0b; /* Dourado */
-    background-color: #171717; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+    border-color: #f59e0b; background-color: #171717;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
 }
 
-/* Grid de 2 Barbeiros (Cards) */
 .grid-barbeiros {
-    display: grid; grid-template-columns: 1fr 1fr; /* 2 Colunas */
+    display: grid; grid-template-columns: 1fr 1fr;
     gap: 1.5rem; margin-top: 0.5rem;
 }
 
 .input-radio-barbeiro { display: none; }
-
 .cartao-barbeiro { cursor: pointer; position: relative; }
 
 .conteudo-barbeiro {
@@ -327,7 +344,6 @@ html {
 }
 .nome-barbeiro-card { color: #d1d5db; font-weight: 600; font-size: 1rem; text-align: center; }
 
-/* Estado Selecionado */
 .input-radio-barbeiro:checked + .conteudo-barbeiro {
     border-color: #f59e0b; background-color: rgba(245, 158, 11, 0.05);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -335,7 +351,6 @@ html {
 .input-radio-barbeiro:checked + .conteudo-barbeiro .foto-barbeiro { border-color: #f59e0b; }
 .input-radio-barbeiro:checked + .conteudo-barbeiro .nome-barbeiro-card { color: #f59e0b; font-weight: bold; }
 
-/* Botão Confirmar */
 .botao-confirmar {
     width: 100%; background-color: #f59e0b; color: #000000; padding: 1.2rem;
     border-radius: 0.75rem; font-size: 1.125rem; font-weight: 700; border: none;
@@ -347,13 +362,16 @@ html {
     box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
 }
 
+.botao-confirmar:disabled {
+    background-color: #404040; color: #a3a3a3; cursor: not-allowed;
+    transform: none !important; box-shadow: none !important; opacity: 0.7;
+}
+
 .texto-info-horario {
     color: #9ca3af; font-size: 0.85rem; margin-top: 0.5rem;
     display: flex; align-items: center; gap: 0.5rem;
 }
 
-/*9. OUTRAS PÁGINAS (SOBRE, LOGIN, ADMIN)*/
-/* Página Sobre */
 .container-sobre { max-width: 56rem; margin: 0 auto; }
 .caixa-sobre {
     background-color: #1a1a1a; border-radius: 0.75rem; padding: 2rem;
@@ -367,7 +385,6 @@ html {
 .titulo-valor { font-size: 1.5rem; font-weight: bold; color: #ffffff; margin-bottom: 1rem; }
 .texto-valor { color: #d1d5db; }
 
-/* Página Login */
 .container-login {
     max-width: 28rem; margin: 0 auto; background-color: #1a1a1a;
     border-radius: 0.75rem; padding: 2rem; border: 1px solid #333333;
@@ -383,7 +400,6 @@ html {
 .botao-login:hover { background-color: #e5e5e5; }
 .texto-info-senha { color: #9ca3af; font-size: 0.875rem; text-align: center; }
 
-/* Página Admin */
 .painel-admin { display: flex; flex-direction: column; gap: 1.5rem; }
 .cabecalho-admin { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
 .titulo-admin { font-size: 1.875rem; font-weight: bold; color: white; }
@@ -397,10 +413,16 @@ html {
 }
 .cartao-agendamento:hover { background-color: #2a2a2a; }
 
-/*10. RODAPÉ*/
+.botao-cancelar {
+    background-color: #ef4444; color: white; padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem; border: none; cursor: pointer; white-space: nowrap;
+    transition: all 0.2s; font-weight: 600;
+}
+.botao-cancelar:hover { background-color: #dc2626; }
+
 .rodape {
     background-color: #000000;
-    margin-top: 0; 
+    margin-top: 0;
     padding: 3rem 0;
 }
 
@@ -435,14 +457,12 @@ html {
 .icone-rede-social:hover { color: #ffffff; }
 .icone-social { height: 1.5rem; width: 1.5rem; }
 
-/* Utilitários */
 .hidden { display: none; }
 
-/*11. RESPONSIVO*/
 @media (min-width: 768px) {
     .botao-menu-mobile { display: none; }
     .menu-desktop { display: flex; }
-    
+
     .secao-hero-dividida { grid-template-columns: 1fr 1fr; }
     .grid-servicos { grid-template-columns: repeat(2, 1fr); }
     .grid-valores { grid-template-columns: repeat(2, 1fr); }
@@ -455,35 +475,17 @@ html {
     .grid-rodape { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* Ajustes Mobile Específicos para Agendamento */
-@media (max-width: 480px) {
-    .container-agendamento { padding: 1.5rem; }
-    .grid-barbeiros { gap: 0.75rem; }
-    .foto-barbeiro { width: 60px; height: 60px; }
-    .imagem-logo-hero { height: 8rem; }
-}
-
-/* Botão Cancelar Admin */
-.botao-cancelar {
-    background-color: #ef4444;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-    font-weight: 600;
-}
-
-.botao-cancelar:hover {
-    background-color: #dc2626;
-}
-
 @media (max-width: 767px) {
     .secao-hero-dividida {
         display: flex;
         flex-direction: column-reverse;
         gap: 1.5rem;
     }
+}
+
+@media (max-width: 480px) {
+    .container-agendamento { padding: 1.5rem; }
+    .grid-barbeiros { gap: 0.75rem; }
+    .foto-barbeiro { width: 60px; height: 60px; }
+    .imagem-logo-hero { height: 8rem; }
 }

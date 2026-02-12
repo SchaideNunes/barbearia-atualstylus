@@ -1,15 +1,24 @@
-// ========== CONSTANTES GERAIS ==========
+const SUPABASE_URL = 'https://tnltiicshevuxkjsnkmm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHRpaWNzaGV2dXhranNua21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQwMzQsImV4cCI6MjA4NjQyMDAzNH0.7otLzZqWwzV1PUQCxrC9k-Y-KZ--QrQVVYllZKSFans';
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const WHATSAPP_BARBEARIA = '5575991309594';
 
 const BARBEIROS = [
-    { id: 1, nome: 'Carlos Silva', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
-    { id: 2, nome: 'Roberto Santos', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' }
+    { id: 1, nome: 'Geilson', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
+    { id: 2, nome: 'Denilson', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' }
 ];
 
-// ========== EFEITOS VISUAIS (SCROLL REVEAL) ==========
+const TODOS_HORARIOS = [
+    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+    '17:00', '17:30', '18:00'
+];
+
+
 function revelarNoScroll() {
     const elementos = document.querySelectorAll('.reveal');
-    
     elementos.forEach(elemento => {
         const posicaoElemento = elemento.getBoundingClientRect().top;
         const alturaJanela = window.innerHeight;
@@ -23,62 +32,39 @@ function revelarNoScroll() {
 window.addEventListener('scroll', revelarNoScroll);
 window.addEventListener('load', revelarNoScroll);
 
-// ========== NAVEGAÇÃO E MENU ==========
 function mostrarPagina(nomePagina) {
-    // Esconder todas as páginas
-    document.querySelectorAll('.pagina').forEach(pagina => {
-        pagina.classList.remove('ativa');
-    });
-    
-    // Remover classe ativa de todos os links
-    document.querySelectorAll('.link-menu').forEach(link => {
-        link.classList.remove('ativo');
-    });
+    document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+    document.querySelectorAll('.link-menu').forEach(l => l.classList.remove('ativo'));
 
-    // Mostrar página selecionada
     const paginaId = 'pagina' + nomePagina.charAt(0).toUpperCase() + nomePagina.slice(1);
     const paginaElemento = document.getElementById(paginaId);
-    
-    if (paginaElemento) {
-        paginaElemento.classList.add('ativa');
-    }
-    
-    // Fechar menu mobile se estiver aberto
+
+    if (paginaElemento) paginaElemento.classList.add('ativa');
     document.getElementById('navegacaoMobile').classList.add('hidden');
     document.getElementById('iconeMenu').classList.remove('hidden');
     document.getElementById('iconeFechar').classList.add('hidden');
 
-    // Configurações específicas da página de agendamento
     if (nomePagina === 'agendamento') {
         const hoje = new Date().toISOString().split('T')[0];
         document.getElementById('campoData').min = hoje;
         atualizarHorariosDisponiveis();
     }
     
-    // Scroll para o topo
     window.scrollTo(0, 0);
 }
 
-// Menu Mobile Toggle
 document.getElementById('botaoMenuMobile').addEventListener('click', function() {
-    const navegacaoMobile = document.getElementById('navegacaoMobile');
-    const iconeMenu = document.getElementById('iconeMenu');
-    const iconeFechar = document.getElementById('iconeFechar');
-    
-    navegacaoMobile.classList.toggle('hidden');
-    iconeMenu.classList.toggle('hidden');
-    iconeFechar.classList.toggle('hidden');
+    document.getElementById('navegacaoMobile').classList.toggle('hidden');
+    document.getElementById('iconeMenu').classList.toggle('hidden');
+    document.getElementById('iconeFechar').classList.toggle('hidden');
 });
 
-// ========== LÓGICA DE AGENDAMENTO ==========
-
-// Atalho para agendar serviço específico
 function agendarServico(nomeServico) {
     mostrarPagina('agendamento');
     setTimeout(function() {
-        document.getElementById('campoServico').value = nomeServico;
-        // Disparar evento de change para validar o botão
-        document.getElementById('campoServico').dispatchEvent(new Event('change'));
+        const select = document.getElementById('campoServico');
+        select.value = nomeServico;
+        select.dispatchEvent(new Event('change'));
         
         document.querySelector('.container-agendamento').scrollIntoView({ 
             behavior: 'smooth',
@@ -87,56 +73,58 @@ function agendarServico(nomeServico) {
     }, 100);
 }
 
-// Sistema de Horários
-const todosHorarios = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-    '17:00', '17:30', '18:00'
-];
 
-function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
-    if (!barbeiroId) return todosHorarios;
-    
-    const agendamentos = JSON.parse(localStorage.getItem('agendamentos') || '[]');
-    const agendamentosDoBarbeiro = agendamentos.filter(ag => 
-        ag.data === dataSelecionada && ag.barbeiroId === parseInt(barbeiroId)
-    );
-    const horariosOcupados = agendamentosDoBarbeiro.map(ag => ag.horario);
-    return todosHorarios.filter(horario => !horariosOcupados.includes(horario));
+async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
+    if (!barbeiroId || !dataSelecionada) return TODOS_HORARIOS;
+
+    try {
+
+        const { data: agendamentos, error } = await supabaseClient
+            .from('agendamentos')
+            .select('horario')
+            .eq('data_agendamento', dataSelecionada)
+            .eq('barbeiro_id', barbeiroId);
+
+        if (error) {
+            console.error('Erro Supabase:', error);
+            return TODOS_HORARIOS;
+        }
+
+        const horariosOcupados = agendamentos.map(ag => ag.horario);
+
+        return TODOS_HORARIOS.filter(h => !horariosOcupados.includes(h));
+
+    } catch (err) {
+        console.error(err);
+        return TODOS_HORARIOS;
+    }
 }
 
-function atualizarHorariosDisponiveis() {
+async function atualizarHorariosDisponiveis() {
     const campoData = document.getElementById('campoData');
     const campoHorario = document.getElementById('campoHorario');
     const barbeiroRadio = document.querySelector('input[name="barbeiro"]:checked');
     
     const dataSelecionada = campoData.value;
     const barbeiroId = barbeiroRadio ? barbeiroRadio.value : null;
-    
-    // Limpar select
-    campoHorario.innerHTML = '<option value="">Selecione um horário</option>';
+  
+    campoHorario.innerHTML = '<option value="">Carregando...</option>';
+    campoHorario.disabled = true;
 
-    if (!dataSelecionada) {
-        todosHorarios.forEach(horario => {
-            const option = document.createElement('option');
-            option.value = horario;
-            option.textContent = horario;
-            campoHorario.appendChild(option);
-        });
+    if (!dataSelecionada || !barbeiroId) {
+        campoHorario.innerHTML = '<option value="">Selecione data e barbeiro</option>';
+        campoHorario.disabled = false;
         return;
     }
+
+    const horariosDisponiveis = await verificarHorariosDisponiveis(dataSelecionada, barbeiroId);
     
-    if (!barbeiroId) {
-        campoHorario.innerHTML = '<option value="">Primeiro selecione um barbeiro</option>';
-        return;
-    }
-    
-    const horariosDisponiveis = verificarHorariosDisponiveis(dataSelecionada, barbeiroId);
-    
+    campoHorario.innerHTML = '<option value="">Selecione um horário</option>';
+    campoHorario.disabled = false;
+
     if (horariosDisponiveis.length === 0) {
         const option = document.createElement('option');
-        option.value = '';
-        option.textContent = 'Sem horários disponíveis';
+        option.text = 'Dia cheio! Sem horários disponíveis.';
         option.disabled = true;
         campoHorario.appendChild(option);
         return;
@@ -148,72 +136,79 @@ function atualizarHorariosDisponiveis() {
         option.textContent = horario;
         campoHorario.appendChild(option);
     });
+
+    verificarStatusBotao();
 }
 
-// ========== CONFIRMAÇÃO E ENVIO ==========
 
-function confirmarAgendamento() {
+
+async function confirmarAgendamento() {
     const nome = document.getElementById('campoNome').value;
     const telefone = document.getElementById('campoTelefone').value;
     const servico = document.getElementById('campoServico').value;
     const barbeiroRadio = document.querySelector('input[name="barbeiro"]:checked');
-    const barbeiroId = barbeiroRadio ? barbeiroRadio.value : null;
     const data = document.getElementById('campoData').value;
     const horario = document.getElementById('campoHorario').value;
+    const btnConfirmar = document.querySelector('.botao-confirmar');
 
-    if (!nome || !telefone || !servico || !barbeiroId || !data || !horario) {
+    if (!nome || !telefone || !servico || !barbeiroRadio || !data || !horario) {
         alert('Por favor, preencha todos os campos!');
         return;
     }
 
-    // Verificar disponibilidade novamente
-    const horariosDisponiveis = verificarHorariosDisponiveis(data, barbeiroId);
-    if (!horariosDisponiveis.includes(horario)) {
-        alert('Este horário acabou de ser reservado. Por favor, escolha outro.');
-        atualizarHorariosDisponiveis();
-        return;
-    }
+    const barbeiroId = parseInt(barbeiroRadio.value);
+    const barbeiroNome = BARBEIROS.find(b => b.id === barbeiroId)?.nome || 'Barbeiro';
 
-    // Extrair valor
     const valorMatch = servico.match(/R\$ (\d+)/);
     const valor = valorMatch ? parseInt(valorMatch[1]) : 0;
-    
-    // Buscar nome do barbeiro
-    const barbeiro = BARBEIROS.find(b => b.id === parseInt(barbeiroId));
 
-    const agendamento = {
-        id: Date.now(),
-        nome: nome,
-        telefone: telefone,
-        servico: servico,
-        valor: valor,
-        barbeiroId: parseInt(barbeiroId),
-        barbeiroNome: barbeiro ? barbeiro.nome : 'Não especificado',
-        data: data,
-        horario: horario,
-        status: 'confirmado',
-        criadoEm: new Date().toISOString()
-    };
+    const textoOriginal = btnConfirmar.innerHTML;
+    btnConfirmar.innerHTML = 'Salvando...';
+    btnConfirmar.disabled = true;
+    btnConfirmar.style.cursor = 'wait';
 
-    // Salvar (Temporário no LocalStorage, depois mudaremos para Supabase)
-    let agendamentos = JSON.parse(localStorage.getItem('agendamentos') || '[]');
-    agendamentos.push(agendamento);
-    localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
+    try {
+        const horariosLivres = await verificarHorariosDisponiveis(data, barbeiroId);
+        if (!horariosLivres.includes(horario)) {
+            alert('Ops! Alguém acabou de pegar esse horário. Por favor, escolha outro.');
+            await atualizarHorariosDisponiveis();
+            return;
+        }
 
-    enviarWhatsApp(agendamento);
+        const { error } = await supabaseClient
+            .from('agendamentos')
+            .insert([{
+                nome: nome,
+                telefone: telefone,
+                servico: servico,
+                valor: valor,
+                barbeiro_id: barbeiroId,
+                barbeiro_nome: barbeiroNome,
+                data_agendamento: data,
+                horario: horario,
+                status: 'confirmado'
+            }]);
 
-    // Resetar formulário
-    document.getElementById('campoNome').value = '';
-    document.getElementById('campoTelefone').value = '';
-    document.getElementById('campoServico').value = '';
-    if (barbeiroRadio) barbeiroRadio.checked = false;
-    document.getElementById('campoData').value = '';
-    document.getElementById('campoHorario').innerHTML = '<option value="">Primeiro selecione data e barbeiro</option>';
-    
-    // Atualizar estado do botão
-    verificarStatusBotao();
+        if (error) throw error;
 
-    alert('✅ Agendamento realizado! A barbearia receberá a confirmação.');
+        enviarWhatsApp({ nome, telefone, servico, valor, barbeiroNome, data, horario });
+
+        document.getElementById('campoNome').value = '';
+        document.getElementById('campoTelefone').value = '';
+        document.getElementById('campoServico').value = '';
+        document.getElementById('campoData').value = '';
+        barbeiroRadio.checked = false;
+        await atualizarHorariosDisponiveis();
+        
+        alert('✅ Agendamento realizado com sucesso!');
+
+    } catch (err) {
+        console.error(err);
+        alert('Erro ao agendar: ' + err.message);
+    } finally {
+        btnConfirmar.innerHTML = textoOriginal;
+        verificarStatusBotao();
+    }
 }
 
 function enviarWhatsApp(agendamento) {
@@ -236,18 +231,6 @@ _Agendamento via site_`;
     window.open(url, '_blank');
 }
 
-// ========== PAGAMENTO PIX (CLIENTE) ==========
-// Mantido caso você queira usar o fluxo de pagamento depois
-const CHAVE_PIX = '75991309594'; // Exemplo
-
-function copiarChavePix() {
-    const textoChave = CHAVE_PIX; // Ou pegue de um elemento HTML
-    navigator.clipboard.writeText(textoChave).then(() => {
-        alert('✅ Chave PIX copiada!');
-    });
-}
-
-// ========== VALIDAÇÃO DO BOTÃO CONFIRMAR ==========
 function verificarStatusBotao() {
     const nome = document.getElementById('campoNome').value.trim();
     const telefone = document.getElementById('campoTelefone').value.trim();
@@ -262,37 +245,37 @@ function verificarStatusBotao() {
     if (formularioCompleto) {
         botao.disabled = false;
         botao.innerHTML = 'Confirmar Agendamento';
+        botao.style.opacity = '1';
+        botao.style.cursor = 'pointer';
     } else {
         botao.disabled = true;
         botao.innerHTML = 'Preencha tudo para confirmar';
+        botao.style.opacity = '0.5';
+        botao.style.cursor = 'not-allowed';
     }
 }
 
-// Event Listeners Globais
 document.addEventListener('DOMContentLoaded', function() {
     const campoData = document.getElementById('campoData');
-    const barbeiroRadios = document.querySelectorAll('input[name="barbeiro"]');
-    
-    // Horários
     if (campoData) campoData.addEventListener('change', atualizarHorariosDisponiveis);
-    barbeiroRadios.forEach(radio => radio.addEventListener('change', atualizarHorariosDisponiveis));
-
-    // Validação do Botão
-    const camposTexto = ['campoNome', 'campoTelefone'];
-    camposTexto.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.addEventListener('input', verificarStatusBotao);
-    });
-
-    const camposSelecao = ['campoServico', 'campoData', 'campoHorario'];
-    camposSelecao.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.addEventListener('change', verificarStatusBotao);
-    });
-
-    barbeiroRadios.forEach(radio => radio.addEventListener('change', verificarStatusBotao));
     
-    // Validação inicial
+    const barbeiroRadios = document.querySelectorAll('input[name="barbeiro"]');
+    barbeiroRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            atualizarHorariosDisponiveis();
+            verificarStatusBotao();
+        });
+    });
+
+    const idsParaMonitorar = ['campoNome', 'campoTelefone', 'campoServico', 'campoData', 'campoHorario'];
+    idsParaMonitorar.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) {
+            el.addEventListener('input', verificarStatusBotao);
+            el.addEventListener('change', verificarStatusBotao);
+        }
+    });
+
     verificarStatusBotao();
     revelarNoScroll();
 });
