@@ -191,6 +191,9 @@ async function confirmarAgendamento() {
 
         if (error) throw error;
 
+        const dadosCliente = { nome: nome, telefone: telefone };
+        localStorage.setItem('dadosClienteBarbearia', JSON.stringify(dadosCliente));
+
         enviarWhatsApp({ nome, telefone, servico, valor, barbeiroNome, data, horario });
 
         document.getElementById('campoNome').value = '';
@@ -256,6 +259,20 @@ function verificarStatusBotao() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    const dadosSalvos = localStorage.getItem('dadosClienteBarbearia');
+    if (dadosSalvos) {
+        const cliente = JSON.parse(dadosSalvos);
+        
+        // Preenche os campos se eles existirem
+        if (cliente.nome) {
+            document.getElementById('campoNome').value = cliente.nome;
+        }
+        if (cliente.telefone) {
+            document.getElementById('campoTelefone').value = cliente.telefone;
+        }
+    }
+
     const campoData = document.getElementById('campoData');
     if (campoData) campoData.addEventListener('change', atualizarHorariosDisponiveis);
     
