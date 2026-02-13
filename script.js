@@ -6,16 +6,62 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const WHATSAPP_BARBEARIA = '5575991309594';
 
 const BARBEIROS = [
-    { id: 1, nome: 'Geilson', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
-    { id: 2, nome: 'Denilson', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' }
+    { 
+        id: 1, 
+        nome: 'Geilson', 
+        foto: 'assets/Geilson.jpg'
+    },
+    { 
+        id: 2, 
+        nome: 'Denilson', 
+        foto: 'assets/Denilson.jpg'
+    }
 ];
 
-const TODOS_HORARIOS = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-    '17:00', '17:30', '18:00'
+const HORARIOS_GEILSON = [
+    '14:00', '14:30', '15:30', '16:00', '17:00', '17:30'
 ];
 
+const HORARIOS_DENILSON = [
+    '08:30', '09:30', '10:00', '11:00', '11:30', 
+    '15:30', '16:00', '17:00'
+];
+
+async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
+    if (!barbeiroId || !dataSelecionada) return [];
+
+    const id = parseInt(barbeiroId);
+    let listaHorariosDoBarbeiro = [];
+
+    if (id === 1) {
+        listaHorariosDoBarbeiro = HORARIOS_GEILSON;
+    } else if (id === 2) {
+        listaHorariosDoBarbeiro = HORARIOS_DENILSON;
+    } else {
+        return [];
+    }
+
+    try {
+        const { data: agendamentos, error } = await supabaseClient
+            .from('agendamentos')
+            .select('horario')
+            .eq('data_agendamento', dataSelecionada)
+            .eq('barbeiro_id', id);
+
+        if (error) {
+            console.error('Erro Supabase:', error);
+            return listaHorariosDoBarbeiro;
+        }
+
+        const horariosOcupados = agendamentos.map(ag => ag.horario);
+        
+        return listaHorariosDoBarbeiro.filter(h => !horariosOcupados.includes(h));
+
+    } catch (err) {
+        console.error(err);
+        return listaHorariosDoBarbeiro;
+    }
+}
 
 function revelarNoScroll() {
     const elementos = document.querySelectorAll('.reveal');
@@ -73,33 +119,6 @@ function agendarServico(nomeServico) {
     }, 100);
 }
 
-
-async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
-    if (!barbeiroId || !dataSelecionada) return TODOS_HORARIOS;
-
-    try {
-
-        const { data: agendamentos, error } = await supabaseClient
-            .from('agendamentos')
-            .select('horario')
-            .eq('data_agendamento', dataSelecionada)
-            .eq('barbeiro_id', barbeiroId);
-
-        if (error) {
-            console.error('Erro Supabase:', error);
-            return TODOS_HORARIOS;
-        }
-
-        const horariosOcupados = agendamentos.map(ag => ag.horario);
-
-        return TODOS_HORARIOS.filter(h => !horariosOcupados.includes(h));
-
-    } catch (err) {
-        console.error(err);
-        return TODOS_HORARIOS;
-    }
-}
-
 async function atualizarHorariosDisponiveis() {
     const campoData = document.getElementById('campoData');
     const campoHorario = document.getElementById('campoHorario');
@@ -139,8 +158,6 @@ async function atualizarHorariosDisponiveis() {
 
     verificarStatusBotao();
 }
-
-
 
 async function confirmarAgendamento() {
     const nome = document.getElementById('campoNome').value;
@@ -264,7 +281,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (dadosSalvos) {
         const cliente = JSON.parse(dadosSalvos);
         
-        // Preenche os campos se eles existirem
         if (cliente.nome) {
             document.getElementById('campoNome').value = cliente.nome;
         }

@@ -63,19 +63,21 @@
                         </svg>
                         <h3 class="titulo-horario-hero">Horário de Funcionamento</h3>
                         <div class="lista-horarios-hero">
-                            <div class="item-horario-hero slide-up" style="animation-delay: 0.1s">
-                                <span class="dia-semana-hero">Segunda - Sexta</span>
-                                <span class="hora-funcionamento-hero">09:00 - 18:30</span>
-                            </div>
-                            <div class="item-horario-hero slide-up" style="animation-delay: 0.2s">
-                                <span class="dia-semana-hero">Sábado</span>
-                                <span class="hora-funcionamento-hero">09:00 - 14:00</span>
-                            </div>
-                            <div class="item-horario-hero slide-up" style="animation-delay: 0.3s">
-                                <span class="dia-semana-hero">Domingo</span>
-                                <span class="hora-fechado-hero">Fechado</span>
-                            </div>
-                        </div>
+    <div class="item-horario-hero">
+        <span class="dia-semana-hero">Seg - Qui</span>
+        <span class="hora-funcionamento-hero">08:30 - 17:00</span>
+    </div>
+
+    <div class="item-horario-hero">
+        <span class="dia-semana-hero">Sex - Sáb</span>
+        <span class="hora-funcionamento-hero">08:30 - 18:00</span>
+    </div>
+
+    <div class="item-horario-hero">
+        <span class="dia-semana-hero">Domingo</span>
+        <span class="hora-fechado-hero">Fechado</span>
+    </div>
+</div>
                         <button onclick="mostrarPagina('agendamento')" class="botao-agendar-hero slide-up" style="animation-delay: 0.4s">
                             ✂️ Agende Seu Horário
                         </button>
@@ -85,72 +87,57 @@
 
             <div class="secao-servicos reveal">
                 <h3 class="titulo-secao">Nossos Serviços</h3>
-                <div class="grid-servicos">
-                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Navalhado - R$ 35')">
-                        <div class="imagem-servico">
-                            <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=400&h=300&fit=crop" alt="Corte Navalhado" class="foto-servico">
-                        </div>
-                        <h4 class="nome-servico">Navalhado</h4>
-                        <p class="preco-servico">R$ 35</p>
-                        <p class="descricao-servico">Corte clássico com navalha</p>
-                    </div>
-                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Degradê - R$ 40')" style="transition-delay: 0.1s">
-                        <div class="imagem-servico">
-                            <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400&h=300&fit=crop" alt="Corte Degradê" class="foto-servico">
-                        </div>
-                        <h4 class="nome-servico">Degradê</h4>
-                        <p class="preco-servico">R$ 40</p>
-                        <p class="descricao-servico">Degradê moderno e estiloso</p>
-                    </div>
-                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Social - R$ 30')" style="transition-delay: 0.2s">
-                        <div class="imagem-servico">
-                            <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400&h=300&fit=crop" alt="Corte Social" class="foto-servico">
-                        </div>
-                        <h4 class="nome-servico">Social</h4>
-                        <p class="preco-servico">R$ 30</p>
-                        <p class="descricao-servico">Corte clássico profissional</p>
-                    </div>
-                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Raspado - R$ 25')" style="transition-delay: 0.3s">
-                        <div class="imagem-servico">
-                            <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=300&fit=crop" alt="Corte Raspado" class="foto-servico">
-                        </div>
-                        <h4 class="nome-servico">Raspado</h4>
-                        <p class="preco-servico">R$ 25</p>
-                        <p class="descricao-servico">Raspado completo ou parcial</p>
-                    </div>
-                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Barba - R$ 25')" style="transition-delay: 0.4s">
-                        <div class="imagem-servico">
-                            <img src="https://images.unsplash.com/photo-1621607512214-68297480165e?w=400&h=300&fit=crop" alt="Barba" class="foto-servico">
-                        </div>
-                        <h4 class="nome-servico">Barba</h4>
-                        <p class="preco-servico">R$ 25</p>
-                        <p class="descricao-servico">Aparar e modelar a barba</p>
-                    </div>
-                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Corte + Barba - R$ 50')" style="transition-delay: 0.5s">
-                        <div class="imagem-servico">
-                            <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&h=300&fit=crop" alt="Corte + Barba" class="foto-servico">
-                        </div>
-                        <h4 class="nome-servico">Corte + Barba</h4>
-                        <p class="preco-servico">R$ 50</p>
-                        <p class="descricao-servico">Combo completo</p>
-                    </div>
-                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Sobrancelha - R$ 15')" style="transition-delay: 0.6s">
-                        <div class="imagem-servico">
-                            <img src="https://images.unsplash.com/photo-1587904862716-b5c6ac1d6d43?w=400&h=300&fit=crop" alt="Sobrancelha" class="foto-servico">
-                        </div>
-                        <h4 class="nome-servico">Sobrancelha</h4>
-                        <p class="preco-servico">R$ 15</p>
-                        <p class="descricao-servico">Design de sobrancelha</p>
-                    </div>
-                    <div class="cartao-servico hover-lift reveal" onclick="agendarServico('Pacote Completo - R$ 65')" style="transition-delay: 0.7s">
-                        <div class="imagem-servico">
-                            <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=400&h=300&fit=crop" alt="Pacote Completo" class="foto-servico">
-                        </div>
-                        <h4 class="nome-servico">Pacote Completo</h4>
-                        <p class="preco-servico">R$ 65</p>
-                        <p class="descricao-servico">Corte + Barba + Sobrancelha</p>
-                    </div>
-                </div>
+               <div class="grid-servicos">
+    
+    <div class="cartao-servico" onclick="agendarServico('Corte e Barba - R$ 35')">
+        <div class="imagem-servico">
+            <img src="assets/corte-barba.jpg" alt="Corte e Barba" class="foto-servico">
+        </div>
+        <h3 class="nome-servico">Corte e Barba</h3>
+        <p class="preco-servico">R$ 35,00</p>
+    </div>
+
+    <div class="cartao-servico" onclick="agendarServico('Corte Social - R$ 25')">
+        <div class="imagem-servico">
+            <img src="assets/corte-social.jpg" alt="Corte Social" class="foto-servico">
+        </div>
+        <h3 class="nome-servico">Corte Social</h3>
+        <p class="preco-servico">R$ 25,00</p>
+    </div>
+
+    <div class="cartao-servico" onclick="agendarServico('Degradê - R$ 25')">
+        <div class="imagem-servico">
+            <img src="assets/degrade.jpg" alt="Degradê" class="foto-servico">
+        </div>
+        <h3 class="nome-servico">Degradê</h3>
+        <p class="preco-servico">R$ 25,00</p>
+    </div>
+
+    <div class="cartao-servico" onclick="agendarServico('Navalhado - R$ 25')">
+        <div class="imagem-servico">
+            <img src="assets/navalhado.jpg" alt="Navalhado" class="foto-servico">
+        </div>
+        <h3 class="nome-servico">Navalhado</h3>
+        <p class="preco-servico">R$ 25,00</p>
+    </div>
+
+    <div class="cartao-servico" onclick="agendarServico('Corte Raspado - R$ 20')">
+        <div class="imagem-servico">
+            <img src="assets/corte-raspado.jpg" alt="Corte Raspado" class="foto-servico">
+        </div>
+        <h3 class="nome-servico">Corte Raspado</h3>
+        <p class="preco-servico">R$ 20,00</p>
+    </div>
+
+    <div class="cartao-servico" onclick="agendarServico('Barba e Pezinho - R$ 15')">
+        <div class="imagem-servico">
+            <img src="assets/barba-pezinho.jpg" alt="Barba e Pezinho" class="foto-servico">
+        </div>
+        <h3 class="nome-servico">Barba e Pezinho</h3>
+        <p class="preco-servico">R$ 15,00</p>
+    </div>
+
+</div>
                 
                 <div class="container-botao-servicos reveal">
                     <button onclick="mostrarPagina('agendamento')" class="botao-agendar-servicos pulse">
@@ -178,35 +165,36 @@
                     <div class="campo-formulario slide-up" style="animation-delay: 0.2s">
                         <label class="label-campo">Escolha seu Barbeiro</label>
                         <div class="grid-barbeiros">
-                            <label class="cartao-barbeiro">
-                                <input type="radio" name="barbeiro" value="1" id="campoBarbeiro" class="input-radio-barbeiro">
-                                <div class="conteudo-barbeiro">
-                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" alt="Carlos Silva" class="foto-barbeiro">
-                                    <p class="nome-barbeiro-card">Geilson</p>
-                                </div>
-                            </label>
-                            <label class="cartao-barbeiro">
-                                <input type="radio" name="barbeiro" value="2" class="input-radio-barbeiro">
-                                <div class="conteudo-barbeiro">
-                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" alt="Roberto Santos" class="foto-barbeiro">
-                                    <p class="nome-barbeiro-card">Denilson</p>
-                                </div>
-                            </label>
-                        </div>
+    
+    <label class="cartao-barbeiro">
+        <input type="radio" name="barbeiro" value="1" class="input-radio-barbeiro">
+        <div class="conteudo-barbeiro">
+            <img src="assets/Geilson.jpg" alt="Barbeiro Geilson" class="foto-barbeiro">
+            <span class="nome-barbeiro-card">Geilson</span>
+        </div>
+    </label>
+
+    <label class="cartao-barbeiro">
+        <input type="radio" name="barbeiro" value="2" class="input-radio-barbeiro">
+        <div class="conteudo-barbeiro">
+            <img src="assets/Denilson.jpg" alt="Barbeiro Denilson" class="foto-barbeiro">
+            <span class="nome-barbeiro-card">Denilson</span>
+        </div>
+    </label>
+
+</div>
                     </div>
 
                     <div class="campo-formulario slide-up" style="animation-delay: 0.3s">
                         <label class="label-campo">Serviço</label>
                         <select id="campoServico" class="select-campo">
-                            <option value="">Selecione um serviço</option>
-                            <option value="Navalhado - R$ 35">Navalhado - R$ 35</option>
-                            <option value="Degradê - R$ 40">Degradê - R$ 40</option>
-                            <option value="Social - R$ 30">Social - R$ 30</option>
-                            <option value="Raspado - R$ 25">Raspado - R$ 25</option>
-                            <option value="Barba - R$ 25">Barba - R$ 25</option>
-                            <option value="Corte + Barba - R$ 50">Corte + Barba - R$ 50</option>
-                            <option value="Sobrancelha - R$ 15">Sobrancelha - R$ 15</option>
-                            <option value="Pacote Completo - R$ 65">Pacote Completo - R$ 65</option>
+                            <option value="">Selecione o serviço...</option>
+        <option value="Corte e Barba - R$ 35">Corte e Barba - R$ 35,00</option>
+        <option value="Corte Social - R$ 25">Corte Social - R$ 25,00</option>
+        <option value="Degradê - R$ 25">Degradê - R$ 25,00</option>
+        <option value="Navalhado - R$ 25">Navalhado - R$ 25,00</option>
+        <option value="Corte Raspado - R$ 20">Corte Raspado - R$ 20,00</option>
+        <option value="Barba e Pezinho - R$ 15">Barba e Pezinho - R$ 15,00</option>
                         </select>
                     </div>
 
@@ -289,7 +277,7 @@
                             <svg class="icone-contato" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
-                            <span class="texto-contato">(75) 98888-8888</span>
+                            <span class="texto-contato">(75) 99130-9594</span>
                         </li>
                         <li class="item-contato">
                             <svg class="icone-contato" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,7 +290,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span class="texto-contato">Rua Exemplo, 123 - Centro<br>Olindina, BA</span>
+                            <span class="texto-contato">Rua Monsenhor Carlos Olimpio, 31, Barrocas 48705000</span>
                         </li>
                     </ul>
                 </div>
@@ -311,12 +299,12 @@
                     <h3 class="titulo-coluna-branca">Horário</h3>
                     <ul class="lista-horario-rodape">
                         <li class="item-horario">
-                            <span class="dia-semana">Segunda - Sexta:</span>
-                            <span class="hora-funcionamento">09:00 - 18:30</span>
+                            <span class="dia-semana">Segunda - Quinta:</span>
+                            <span class="hora-funcionamento">08:30 - 17:00</span>
                         </li>
                         <li class="item-horario">
-                            <span class="dia-semana">Sábado:</span>
-                            <span class="hora-funcionamento">09:00 - 14:00</span>
+                            <span class="dia-semana">Sexta - Sábado:</span>
+                            <span class="hora-funcionamento">08:30 - 18:00</span>
                         </li>
                         <li class="item-horario">
                             <span class="dia-semana">Domingo:</span>
