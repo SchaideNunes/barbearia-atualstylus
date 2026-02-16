@@ -10,6 +10,12 @@
         body { background-color: #111; color: white; font-family: sans-serif; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .slot-btn { transition: all 0.2s; }
+        .slot-livre { background-color: #1f2937; border: 1px solid #374151; color: #9ca3af; }
+        .slot-livre:hover { border-color: #eab308; color: white; }
+        .slot-selecionado { background-color: #ca8a04; border-color: #fbbf24; color: white; font-weight: bold; transform: scale(1.05); }
+        .slot-ocupado { background-color: #450a0a; border-color: #7f1d1d; color: #fca5a5; cursor: not-allowed; opacity: 0.6; }
     </style>
 </head>
 <body>
@@ -36,10 +42,10 @@
 
         <div class="bg-gray-800 p-5 rounded-lg border border-gray-600 mb-6 shadow-lg">
             <h3 class="text-white font-bold mb-4 flex items-center gap-2">
-                ⚡ Ações Rápidas (Agendar ou Bloquear)
+                ⚡ Ações Rápidas
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" id="adminNome" placeholder="Nome do Cliente (ou deixe vazio p/ Bloqueio)" class="bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
+                <input type="text" id="adminNome" placeholder="Nome do Cliente (Vazio p/ Bloqueio)" class="bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
                 <input type="text" id="adminTelefone" placeholder="Telefone (Opcional)" class="bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
                 
                 <div class="flex gap-2">
@@ -73,8 +79,11 @@
                 </label>
 
                 <div class="flex-1 flex justify-end gap-2">
+                    <button onclick="abrirModalBloqueio()" class="bg-red-700 hover:bg-red-600 text-white border border-red-500 px-4 py-2 rounded text-sm font-bold transition flex items-center gap-2">
+                        🛡️ Bloqueio em Lote
+                    </button>
                     <button onclick="criarBloqueio()" class="bg-red-900/50 hover:bg-red-800 text-red-200 border border-red-700 px-4 py-2 rounded text-sm font-bold transition">
-                        🔒 Bloquear Horário
+                        🔒 Bloqueio Unitário
                     </button>
                     <button onclick="criarAgendamentoAdmin()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold transition">
                         ➕ Cadastrar Cliente
@@ -108,11 +117,34 @@
         </div>
     </div>
 
+    <div id="modalBloqueio" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-gray-800 p-6 rounded-lg w-full max-w-2xl border border-gray-600 shadow-2xl m-4">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                <h3 class="text-xl font-bold text-white flex gap-2 items-center">🛡️ Bloqueio Múltiplo</h3>
+                <button onclick="fecharModalBloqueio()" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
+            </div>
+            
+            <p id="infoModal" class="text-sm text-yellow-500 mb-4 font-mono"></p>
+
+            <div id="gridHorarios" class="grid grid-cols-4 sm:grid-cols-5 gap-2 mb-6 max-h-[300px] overflow-y-auto p-1">
+                </div>
+
+            <div class="flex justify-between items-center pt-4 border-t border-gray-700">
+                <span id="contadorSelecao" class="text-sm text-gray-400">0 selecionados</span>
+                <div class="flex gap-2">
+                    <button onclick="fecharModalBloqueio()" class="px-4 py-2 rounded text-gray-300 hover:bg-gray-700 text-sm">Cancelar</button>
+                    <button onclick="confirmarBloqueioLote()" class="px-6 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-900/50">
+                        Confirmar Bloqueio
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://tnltiicshevuxkjsnkmm.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHRpaWNzaGV2dXhranNua21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQwMzQsImV4cCI6MjA4NjQyMDAzNH0.7otLzZqWwzV1PUQCxrC9k-Y-KZ--QrQVVYllZKSFans'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 
         const TODOS_HORARIOS = [
             '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', 
@@ -123,22 +155,17 @@
         let cacheAgendamentos = [];
         let mostrandoConcluidos = false;
 
+        let slotsSelecionados = [];
 
         async function iniciarAdmin() {
             const lista = document.getElementById('listaAgendamentos');
-
             try {
-     
                 const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
                 if (authError || !session) {
                     window.location.href = 'login.html'; 
                     return;
                 }
-
-
                 carregarHorariosAdmin();
-
-
                 const { data: agendamentos, error: dbError } = await supabaseClient
                     .from('agendamentos')
                     .select('*')
@@ -146,15 +173,119 @@
                     .order('horario', { ascending: true });
 
                 if (dbError) throw dbError;
-
                 cacheAgendamentos = agendamentos;
                 aplicarFiltros(); 
-
             } catch (err) {
                 console.error('Erro:', err);
                 lista.innerHTML = `<p class="text-red-500 text-center">Erro: ${err.message}</p>`;
             }
         }
+
+
+        async function abrirModalBloqueio() {
+            const data = document.getElementById('adminData').value;
+            const barbeiroId = document.getElementById('adminBarbeiro').value;
+
+            if(!data || !barbeiroId) {
+                alert("Por favor, selecione uma DATA e um BARBEIRO na tela principal antes de abrir o bloqueio em lote.");
+                return;
+            }
+
+            const barbeiroNome = barbeiroId == 1 ? 'Geilson' : 'Denilson';
+            const dataFormatada = new Date(data + 'T00:00:00').toLocaleDateString('pt-BR');
+            
+            document.getElementById('infoModal').innerHTML = `Bloqueando agenda de <b>${barbeiroNome}</b> para <b>${dataFormatada}</b>`;
+            
+            document.getElementById('modalBloqueio').classList.replace('hidden', 'flex');
+            document.getElementById('gridHorarios').innerHTML = '<p class="text-gray-400 text-center col-span-5">Carregando disponibilidade...</p>';
+            
+            const { data: agendamentosDia } = await supabaseClient
+                .from('agendamentos')
+                .select('horario')
+                .eq('data_agendamento', data)
+                .eq('barbeiro_id', barbeiroId)
+                .neq('status', 'cancelado');
+
+            const horariosOcupados = agendamentosDia.map(a => a.horario);
+            slotsSelecionados = []; 
+            atualizarGrid(horariosOcupados);
+        }
+
+        function atualizarGrid(ocupados) {
+            const container = document.getElementById('gridHorarios');
+            container.innerHTML = '';
+            
+            TODOS_HORARIOS.forEach(horario => {
+                const isOcupado = ocupados.includes(horario);
+                const btn = document.createElement('button');
+                btn.innerText = horario;
+                btn.className = `p-2 rounded text-sm font-mono border slot-btn ${
+                    isOcupado ? 'slot-ocupado' : 'slot-livre'
+                }`;
+                
+                if(isOcupado) {
+                    btn.disabled = true;
+                    btn.title = "Horário já ocupado/bloqueado";
+                } else {
+                    btn.onclick = () => toggleSlot(horario, btn);
+                }
+                container.appendChild(btn);
+            });
+            atualizarContador();
+        }
+
+        function toggleSlot(horario, btn) {
+            if(slotsSelecionados.includes(horario)) {
+                slotsSelecionados = slotsSelecionados.filter(h => h !== horario);
+                btn.className = btn.className.replace('slot-selecionado', 'slot-livre');
+            } else {
+                slotsSelecionados.push(horario);
+                btn.className = btn.className.replace('slot-livre', 'slot-selecionado');
+            }
+            atualizarContador();
+        }
+
+        function atualizarContador() {
+            document.getElementById('contadorSelecao').innerText = `${slotsSelecionados.length} horários selecionados`;
+        }
+
+        function fecharModalBloqueio() {
+            document.getElementById('modalBloqueio').classList.replace('flex', 'hidden');
+        }
+
+        async function confirmarBloqueioLote() {
+            if(slotsSelecionados.length === 0) return alert("Nenhum horário selecionado.");
+            
+            const data = document.getElementById('adminData').value;
+            const barbeiroId = document.getElementById('adminBarbeiro').value;
+            const barbeiroNome = barbeiroId == 1 ? 'Geilson' : 'Denilson';
+
+            if(!confirm(`Confirma o bloqueio de ${slotsSelecionados.length} horários para ${barbeiroNome}?`)) return;
+
+            const inserts = slotsSelecionados.map(horario => ({
+                nome: 'BLOQUEIO',
+                telefone: '',
+                servico: 'BLOQUEIO ADMIN',
+                valor: 0,
+                barbeiro_id: parseInt(barbeiroId),
+                barbeiro_nome: barbeiroNome,
+                data_agendamento: data,
+                horario: horario,
+                status: 'bloqueado'
+            }));
+
+            try {
+                const { error } = await supabaseClient.from('agendamentos').insert(inserts);
+                if(error) throw error;
+                
+                alert("Horários bloqueados com sucesso!");
+                fecharModalBloqueio();
+                iniciarAdmin();
+            } catch(err) {
+                alert("Erro ao bloquear: " + err.message);
+            }
+        }
+
 
         function renderizarLista(listaDeDados) {
             const divLista = document.getElementById('listaAgendamentos');
@@ -212,7 +343,6 @@
 
         function mudarAba(verConcluidos) {
             mostrandoConcluidos = verConcluidos;
-            
             const btnPendentes = document.getElementById('btnPendentes');
             const btnConcluidos = document.getElementById('btnConcluidos');
 
@@ -223,7 +353,6 @@
                 btnPendentes.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-yellow-600 bg-yellow-600/20 text-yellow-500";
                 btnConcluidos.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700";
             }
-
             aplicarFiltros();
         }
 
@@ -236,14 +365,9 @@
                 const matchTexto = item.nome.toLowerCase().includes(texto) || item.telefone.includes(texto);
                 const matchData = data ? item.data_agendamento === data : true;
                 const matchBarbeiro = barbeiroId ? item.barbeiro_id == barbeiroId : true;
-
-                const matchStatus = mostrandoConcluidos 
-                    ? item.status === 'concluido' 
-                    : item.status !== 'concluido';
-
+                const matchStatus = mostrandoConcluidos ? item.status === 'concluido' : item.status !== 'concluido';
                 return matchTexto && matchData && matchBarbeiro && matchStatus;
             });
-
             renderizarLista(filtrados);
         }
 
@@ -256,20 +380,12 @@
 
         async function concluirAgendamento(id) {
             if(!confirm("Marcar serviço como realizado?")) return;
-
             try {
-                const { error } = await supabaseClient
-                    .from('agendamentos')
-                    .update({ status: 'concluido' })
-                    .eq('id', id);
-
+                const { error } = await supabaseClient.from('agendamentos').update({ status: 'concluido' }).eq('id', id);
                 if (error) throw error;
-
                 const index = cacheAgendamentos.findIndex(ag => ag.id === id);
                 if (index !== -1) cacheAgendamentos[index].status = 'concluido';
-                
                 aplicarFiltros();
-
             } catch (error) {
                 alert('Erro: ' + error.message);
             }
@@ -281,9 +397,7 @@
             const barbeiro = document.getElementById('adminBarbeiro').value;
 
             if(!data || !horario || !barbeiro) return alert("Preencha Data, Horário e Barbeiro para bloquear!");
-
             if(!confirm(`Bloquear o horário ${horario} do dia ${data}? Ninguém poderá agendar.`)) return;
-
             await salvarNoBanco("BLOQUEIO", "", "BLOQUEIO ADMIN", 0, barbeiro, data, horario, false);
         }
 
@@ -297,23 +411,19 @@
             const recorrente = document.getElementById('checkRecorrente').checked;
 
             if(!nome || !data || !horario || !barbeiro) return alert("Preencha Nome, Data, Horário e Barbeiro!");
-
             const valorMatch = servico.match(/R\$ (\d+)/);
             const valor = valorMatch ? parseInt(valorMatch[1]) : 0;
-
             await salvarNoBanco(nome, telefone, servico, valor, barbeiro, data, horario, recorrente);
         }
 
         async function salvarNoBanco(nome, telefone, servico, valor, barbeiroId, dataInicial, horario, isRecorrente) {
             const barbeiroNome = barbeiroId == 1 ? 'Geilson' : 'Denilson';
             const inserts = [];
-
             const repeticoes = isRecorrente ? 4 : 1;
             let dataAtual = new Date(dataInicial + 'T00:00:00');
 
             for (let i = 0; i < repeticoes; i++) {
                 const dataStr = dataAtual.toISOString().split('T')[0];
-
                 inserts.push({
                     nome: nome,
                     telefone: telefone,
@@ -325,22 +435,17 @@
                     horario: horario,
                     status: nome === 'BLOQUEIO' ? 'bloqueado' : 'confirmado'
                 });
-
                 dataAtual.setDate(dataAtual.getDate() + 7);
             }
 
             try {
                 const { error } = await supabaseClient.from('agendamentos').insert(inserts);
                 if (error) throw error;
-
                 alert(isRecorrente ? 'Agendamentos fixos criados (4 semanas)!' : 'Salvo com sucesso!');
-                
                 document.getElementById('adminNome').value = '';
                 document.getElementById('adminTelefone').value = '';
                 document.getElementById('checkRecorrente').checked = false;
-                
                 iniciarAdmin();
-
             } catch (err) {
                 alert('Erro ao salvar: ' + err.message);
             }
@@ -348,18 +453,11 @@
 
         async function deletarAgendamento(id) {
             if(!confirm("Tem certeza que deseja apagar?")) return;
-
             try {
-                const { error } = await supabaseClient
-                    .from('agendamentos')
-                    .delete()
-                    .eq('id', id);
-
+                const { error } = await supabaseClient.from('agendamentos').delete().eq('id', id);
                 if (error) throw error;
-
                 cacheAgendamentos = cacheAgendamentos.filter(ag => ag.id !== id);
                 aplicarFiltros();
-
             } catch (error) {
                 alert('Erro ao deletar: ' + error.message);
             }
@@ -367,9 +465,7 @@
 
         function carregarHorariosAdmin() {
             const select = document.getElementById('adminHorario');
-            const barbeiroId = document.getElementById('adminBarbeiro').value;
             select.innerHTML = '<option value="">Horário</option>';
-
             TODOS_HORARIOS.forEach(h => {
                 const opt = document.createElement('option');
                 opt.value = h;
