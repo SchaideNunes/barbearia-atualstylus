@@ -8,59 +8,102 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #111; color: white; font-family: sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <div class="max-w-4xl mx-auto p-4">
         <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-            <h1 class="text-2xl font-bold text-white">Painel Administrativo</h1>
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                🛡️ Painel Administrativo
+            </h1>
             <button onclick="sair()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition font-semibold text-sm">
                 Sair
             </button>
         </div>
 
-        <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 mb-6 shadow-md">
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider">Filtrar Agenda</h3>
-                <span id="totalRegistros" class="text-xs text-yellow-500 font-mono">Total: 0</span>
+        <div class="flex gap-2 mb-6">
+            <button id="btnPendentes" onclick="mudarAba(false)" 
+                class="flex-1 py-3 rounded-lg font-bold text-sm transition border border-yellow-600 bg-yellow-600/20 text-yellow-500 hover:bg-yellow-600 hover:text-white">
+                ⏳ Agendados (Pendentes)
+            </button>
+            <button id="btnConcluidos" onclick="mudarAba(true)" 
+                class="flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white">
+                ✅ Histórico (Concluídos)
+            </button>
+        </div>
+
+        <div class="bg-gray-800 p-5 rounded-lg border border-gray-600 mb-6 shadow-lg">
+            <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                ⚡ Ações Rápidas (Agendar ou Bloquear)
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="adminNome" placeholder="Nome do Cliente (ou deixe vazio p/ Bloqueio)" class="bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
+                <input type="text" id="adminTelefone" placeholder="Telefone (Opcional)" class="bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
+                
+                <div class="flex gap-2">
+                    <input type="date" id="adminData" class="flex-1 bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
+                    <select id="adminHorario" class="w-32 bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
+                        <option value="">Horário</option>
+                        </select>
+                </div>
+
+                <div class="flex gap-2">
+                    <select id="adminBarbeiro" class="flex-1 bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none" onchange="carregarHorariosAdmin()">
+                        <option value="">Selecione o Barbeiro</option>
+                        <option value="1">Geilson</option>
+                        <option value="2">Denilson</option>
+                    </select>
+                    <select id="adminServico" class="flex-1 bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
+                        <option value="Corte e Barba - R$ 35">Corte e Barba</option>
+                        <option value="Corte Social - R$ 25">Corte Social</option>
+                        <option value="Degradê - R$ 25">Degradê</option>
+                        <option value="Navalhado - R$ 25">Navalhado</option>
+                        <option value="Corte Raspado - R$ 20">Corte Raspado</option>
+                        <option value="Barba e Pezinho - R$ 15">Barba e Pezinho</option>
+                    </select>
+                </div>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <input type="text" id="buscaTexto" placeholder="🔍 Buscar Nome ou Telefone..." 
-                        class="w-full bg-gray-900 text-white border border-gray-600 rounded p-2 text-sm focus:border-yellow-500 focus:outline-none transition"
-                        oninput="aplicarFiltros()">
-                </div>
 
-                <div>
-                    <input type="date" id="buscaData" 
-                        class="w-full bg-gray-900 text-white border border-gray-600 rounded p-2 text-sm focus:border-yellow-500 focus:outline-none transition"
-                        onchange="aplicarFiltros()">
-                </div>
+            <div class="mt-4 flex flex-wrap items-center gap-4 border-t border-gray-700 pt-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="checkRecorrente" class="w-4 h-4 rounded text-yellow-500 focus:ring-yellow-500 bg-gray-700 border-gray-500">
+                    <span class="text-sm text-gray-300">Repetir por 4 semanas (Cliente Fixo)</span>
+                </label>
 
-                <div>
-            <select id="buscaBarbeiro" 
-                class="w-full bg-gray-900 text-white border border-gray-600 rounded p-2 text-sm focus:border-yellow-500 focus:outline-none transition"
-                 onchange="aplicarFiltros()">
-                <option value="">✂️ Todos os Barbeiros</option>
-        
-                <option value="1">Geilson</option>
-                <option value="2">Denilson</option>
-         </select>
-                </div>
-
-                <div>
-                    <button onclick="limparFiltros()" 
-                        class="w-full bg-gray-700 hover:bg-gray-600 text-white border border-gray-500 rounded p-2 text-sm transition font-medium">
-                        Limpar Filtros
+                <div class="flex-1 flex justify-end gap-2">
+                    <button onclick="criarBloqueio()" class="bg-red-900/50 hover:bg-red-800 text-red-200 border border-red-700 px-4 py-2 rounded text-sm font-bold transition">
+                        🔒 Bloquear Horário
+                    </button>
+                    <button onclick="criarAgendamentoAdmin()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold transition">
+                        ➕ Cadastrar Cliente
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="listaAgendamentos" class="space-y-4">
+        <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 mb-6 shadow-md">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider">Filtrar Lista</h3>
+                <span id="totalRegistros" class="text-xs text-yellow-500 font-mono">Total: 0</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="buscaTexto" placeholder="🔍 Nome ou Telefone..." class="bg-gray-900 text-white border border-gray-600 rounded p-2 text-sm focus:border-yellow-500 outline-none" oninput="aplicarFiltros()">
+                <input type="date" id="buscaData" class="bg-gray-900 text-white border border-gray-600 rounded p-2 text-sm focus:border-yellow-500 outline-none" onchange="aplicarFiltros()">
+                <select id="buscaBarbeiro" class="bg-gray-900 text-white border border-gray-600 rounded p-2 text-sm focus:border-yellow-500 outline-none" onchange="aplicarFiltros()">
+                    <option value="">✂️ Todos</option>
+                    <option value="1">Geilson</option>
+                    <option value="2">Denilson</option>
+                </select>
+                <button onclick="limparFiltros()" class="bg-gray-700 hover:bg-gray-600 text-white border border-gray-500 rounded p-2 text-sm transition">Limpar</button>
+            </div>
+        </div>
+
+        <div id="listaAgendamentos" class="space-y-4 fade-in">
             <div class="text-center py-10">
-                <p class="text-gray-400 animate-pulse">Carregando dados seguros...</p>
+                <p class="text-gray-400 animate-pulse">Carregando...</p>
             </div>
         </div>
     </div>
@@ -70,97 +113,120 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHRpaWNzaGV2dXhranNua21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQwMzQsImV4cCI6MjA4NjQyMDAzNH0.7otLzZqWwzV1PUQCxrC9k-Y-KZ--QrQVVYllZKSFans'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+
+        const TODOS_HORARIOS = [
+            '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', 
+            '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', 
+            '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'
+        ];
+
         let cacheAgendamentos = [];
+        let mostrandoConcluidos = false;
+
 
         async function iniciarAdmin() {
             const lista = document.getElementById('listaAgendamentos');
 
             try {
+     
                 const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
-
                 if (authError || !session) {
                     window.location.href = 'login.html'; 
                     return;
                 }
+
+
+                carregarHorariosAdmin();
+
+
                 const { data: agendamentos, error: dbError } = await supabaseClient
                     .from('agendamentos')
                     .select('*')
-                    .order('data_agendamento', { ascending: true }) 
+                    .order('data_agendamento', { ascending: true })
                     .order('horario', { ascending: true });
 
                 if (dbError) throw dbError;
+
                 cacheAgendamentos = agendamentos;
-                renderizarLista(cacheAgendamentos);
+                aplicarFiltros(); 
 
             } catch (err) {
                 console.error('Erro:', err);
-                lista.innerHTML = `
-                    <div class="bg-red-900/50 p-4 rounded border border-red-500 text-white">
-                        <strong class="block mb-2">Erro ao carregar dados:</strong>
-                        ${err.message}
-                    </div>
-                `;
+                lista.innerHTML = `<p class="text-red-500 text-center">Erro: ${err.message}</p>`;
             }
         }
+
         function renderizarLista(listaDeDados) {
             const divLista = document.getElementById('listaAgendamentos');
             const contador = document.getElementById('totalRegistros');
+            
             contador.innerText = `Total: ${listaDeDados ? listaDeDados.length : 0}`;
 
             if (!listaDeDados || listaDeDados.length === 0) {
                 divLista.innerHTML = `
                     <div class="text-center py-10 bg-gray-900 rounded-lg border border-gray-700">
-                        <svg class="w-12 h-12 text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <p class="text-xl text-gray-300">Nenhum agendamento encontrado.</p>
-                        <p class="text-sm text-gray-500 mt-1">Tente mudar os filtros ou aguarde novos clientes.</p>
-                    </div>
-                `;
+                        <p class="text-xl text-gray-300">Nenhum registro nesta aba.</p>
+                    </div>`;
                 return;
             }
 
             divLista.innerHTML = listaDeDados.map(ag => {
                 const dataBR = new Date(ag.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR');
+                const isBloqueio = ag.nome === 'BLOQUEIO' || ag.servico === 'BLOQUEIO ADMIN';
+                const cardClass = isBloqueio ? 'border-red-500/50 bg-red-900/10' : 'border-gray-700 bg-gray-800';
                 
                 return `
-                <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-lg hover:border-yellow-500/50 transition-colors duration-200">
+                <div class="${cardClass} p-5 rounded-lg border shadow-lg hover:border-gray-500 transition-all duration-200 fade-in relative">
+                    ${isBloqueio ? '<div class="absolute top-2 right-2 text-xs text-red-400 font-bold border border-red-500 px-2 rounded">BLOQUEADO</div>' : ''}
+                    
                     <div class="flex justify-between items-start mb-4 border-b border-gray-700 pb-3">
                         <div>
                             <h3 class="text-lg font-bold text-white flex items-center gap-2">
                                 ${ag.nome}
                             </h3>
-                            <p class="text-yellow-500 text-sm font-medium mt-1">${ag.servico}</p>
+                            <p class="${isBloqueio ? 'text-red-400' : 'text-yellow-500'} text-sm font-medium mt-1">${ag.servico}</p>
                         </div>
-                        <span class="bg-green-900/30 text-green-400 text-xs px-2 py-1 rounded border border-green-800 font-bold uppercase tracking-wide">
-                            ${ag.status || 'Confirmado'}
-                        </span>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm text-gray-300 mb-5">
-                        <div class="flex items-center gap-2">
-                            <span class="text-gray-500">📅</span> ${dataBR}
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-gray-500">⏰</span> <span class="font-bold text-white">${ag.horario}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-gray-500">📱</span> ${ag.telefone}
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-gray-500">✂️</span> ${ag.barbeiro_nome || 'Barbeiro'}
-                        </div>
+                    <div class="grid grid-cols-2 gap-y-3 text-sm text-gray-300 mb-5">
+                        <div class="flex items-center gap-2"><span class="text-gray-500">📅</span> ${dataBR}</div>
+                        <div class="flex items-center gap-2"><span class="text-gray-500">⏰</span> <span class="font-bold text-white">${ag.horario}</span></div>
+                        <div class="flex items-center gap-2"><span class="text-gray-500">📱</span> ${ag.telefone || '-'}</div>
+                        <div class="flex items-center gap-2"><span class="text-gray-500">✂️</span> ${ag.barbeiro_nome || 'Barbeiro'}</div>
                     </div>
 
-                    <div class="flex justify-end pt-2">
-                        <button onclick="deletarAgendamento(${ag.id})" class="text-red-400 hover:text-red-300 text-sm font-medium flex items-center gap-1 hover:underline transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            Cancelar Agendamento
+                    <div class="flex justify-end pt-2 gap-3 border-t border-gray-700/50 mt-2">
+                        ${!mostrandoConcluidos && !isBloqueio ? `
+                        <button onclick="concluirAgendamento(${ag.id})" class="flex items-center gap-1 text-green-400 hover:text-green-300 text-sm font-bold hover:bg-green-900/20 px-3 py-1 rounded transition">
+                            ✅ Concluir
+                        </button>
+                        ` : ''}
+
+                        <button onclick="deletarAgendamento(${ag.id})" class="flex items-center gap-1 text-red-400 hover:text-red-300 text-sm font-medium hover:bg-red-900/20 px-3 py-1 rounded transition">
+                            🗑️ ${mostrandoConcluidos ? 'Apagar' : 'Cancelar/Liberar'}
                         </button>
                     </div>
                 </div>
             `}).join('');
         }
+
+        function mudarAba(verConcluidos) {
+            mostrandoConcluidos = verConcluidos;
+            
+            const btnPendentes = document.getElementById('btnPendentes');
+            const btnConcluidos = document.getElementById('btnConcluidos');
+
+            if(verConcluidos) {
+                btnConcluidos.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-green-600 bg-green-600/20 text-green-500";
+                btnPendentes.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700";
+            } else {
+                btnPendentes.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-yellow-600 bg-yellow-600/20 text-yellow-500";
+                btnConcluidos.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700";
+            }
+
+            aplicarFiltros();
+        }
+
         function aplicarFiltros() {
             const texto = document.getElementById('buscaTexto').value.toLowerCase();
             const data = document.getElementById('buscaData').value;
@@ -171,19 +237,117 @@
                 const matchData = data ? item.data_agendamento === data : true;
                 const matchBarbeiro = barbeiroId ? item.barbeiro_id == barbeiroId : true;
 
-                return matchTexto && matchData && matchBarbeiro;
+                const matchStatus = mostrandoConcluidos 
+                    ? item.status === 'concluido' 
+                    : item.status !== 'concluido';
+
+                return matchTexto && matchData && matchBarbeiro && matchStatus;
             });
 
             renderizarLista(filtrados);
         }
+
         function limparFiltros() {
             document.getElementById('buscaTexto').value = '';
             document.getElementById('buscaData').value = '';
             document.getElementById('buscaBarbeiro').value = '';
-            renderizarLista(cacheAgendamentos);
+            aplicarFiltros();
         }
+
+        async function concluirAgendamento(id) {
+            if(!confirm("Marcar serviço como realizado?")) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('agendamentos')
+                    .update({ status: 'concluido' })
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                const index = cacheAgendamentos.findIndex(ag => ag.id === id);
+                if (index !== -1) cacheAgendamentos[index].status = 'concluido';
+                
+                aplicarFiltros();
+
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function criarBloqueio() {
+            const data = document.getElementById('adminData').value;
+            const horario = document.getElementById('adminHorario').value;
+            const barbeiro = document.getElementById('adminBarbeiro').value;
+
+            if(!data || !horario || !barbeiro) return alert("Preencha Data, Horário e Barbeiro para bloquear!");
+
+            if(!confirm(`Bloquear o horário ${horario} do dia ${data}? Ninguém poderá agendar.`)) return;
+
+            await salvarNoBanco("BLOQUEIO", "", "BLOQUEIO ADMIN", 0, barbeiro, data, horario, false);
+        }
+
+        async function criarAgendamentoAdmin() {
+            const nome = document.getElementById('adminNome').value;
+            const telefone = document.getElementById('adminTelefone').value || 'Sem telefone';
+            const servico = document.getElementById('adminServico').value;
+            const data = document.getElementById('adminData').value;
+            const horario = document.getElementById('adminHorario').value;
+            const barbeiro = document.getElementById('adminBarbeiro').value;
+            const recorrente = document.getElementById('checkRecorrente').checked;
+
+            if(!nome || !data || !horario || !barbeiro) return alert("Preencha Nome, Data, Horário e Barbeiro!");
+
+            const valorMatch = servico.match(/R\$ (\d+)/);
+            const valor = valorMatch ? parseInt(valorMatch[1]) : 0;
+
+            await salvarNoBanco(nome, telefone, servico, valor, barbeiro, data, horario, recorrente);
+        }
+
+        async function salvarNoBanco(nome, telefone, servico, valor, barbeiroId, dataInicial, horario, isRecorrente) {
+            const barbeiroNome = barbeiroId == 1 ? 'Geilson' : 'Denilson';
+            const inserts = [];
+
+            const repeticoes = isRecorrente ? 4 : 1;
+            let dataAtual = new Date(dataInicial + 'T00:00:00');
+
+            for (let i = 0; i < repeticoes; i++) {
+                const dataStr = dataAtual.toISOString().split('T')[0];
+
+                inserts.push({
+                    nome: nome,
+                    telefone: telefone,
+                    servico: servico,
+                    valor: valor,
+                    barbeiro_id: parseInt(barbeiroId),
+                    barbeiro_nome: barbeiroNome,
+                    data_agendamento: dataStr,
+                    horario: horario,
+                    status: nome === 'BLOQUEIO' ? 'bloqueado' : 'confirmado'
+                });
+
+                dataAtual.setDate(dataAtual.getDate() + 7);
+            }
+
+            try {
+                const { error } = await supabaseClient.from('agendamentos').insert(inserts);
+                if (error) throw error;
+
+                alert(isRecorrente ? 'Agendamentos fixos criados (4 semanas)!' : 'Salvo com sucesso!');
+                
+                document.getElementById('adminNome').value = '';
+                document.getElementById('adminTelefone').value = '';
+                document.getElementById('checkRecorrente').checked = false;
+                
+                iniciarAdmin();
+
+            } catch (err) {
+                alert('Erro ao salvar: ' + err.message);
+            }
+        }
+
         async function deletarAgendamento(id) {
-            if(!confirm("Tem certeza que deseja cancelar este agendamento?")) return;
+            if(!confirm("Tem certeza que deseja apagar?")) return;
 
             try {
                 const { error } = await supabaseClient
@@ -193,17 +357,32 @@
 
                 if (error) throw error;
 
-                alert('Agendamento removido!');
-                iniciarAdmin();
+                cacheAgendamentos = cacheAgendamentos.filter(ag => ag.id !== id);
+                aplicarFiltros();
 
             } catch (error) {
                 alert('Erro ao deletar: ' + error.message);
             }
         }
+
+        function carregarHorariosAdmin() {
+            const select = document.getElementById('adminHorario');
+            const barbeiroId = document.getElementById('adminBarbeiro').value;
+            select.innerHTML = '<option value="">Horário</option>';
+
+            TODOS_HORARIOS.forEach(h => {
+                const opt = document.createElement('option');
+                opt.value = h;
+                opt.innerText = h;
+                select.appendChild(opt);
+            });
+        }
+
         async function sair() {
             await supabaseClient.auth.signOut();
             window.location.href = 'login.html';
         }
+
         iniciarAdmin();
     </script>
 </body>
