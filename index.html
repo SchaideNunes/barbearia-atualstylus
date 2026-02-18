@@ -11,7 +11,7 @@
         <div class="container-cabecalho">
             <div class="barra-navegacao">
                 <div class="logo">
-                    <img src="lOGO_SEM_FUNDO_para_usar-removebg-preview.png" alt="Logo AtualStylus" class="imagem-logo-cabecalho">
+                    <img src="assets/logo sem fundo.png" alt="Logo AtualEstilo" class="imagem-logo-cabecalho" style="height: 90px; max-height: none; width: auto;">
                     <h1 class="nome-logo"></h1>
                 </div>
                 
@@ -47,8 +47,7 @@
                     <div class="conteudo-hero-texto">
                         <div class="container-icone-hero">
                             <div class="circulo-icone scale-in">
-                                <!-- Card inicial-->
-                                <img src="lOGO_SEM_FUNDO_para_usar-removebg-preview.png" alt="Logo AtualStylus" class="imagem-logo-hero">
+                                <img src="assets/logo sem fundo.png" alt="Logo AtualEstilo" class="imagem-logo-hero" style="width: 280px; height: auto; max-width: 100%;">
                             </div>
                         </div>
                         <p class="subtitulo-hero fade-in" style="animation-delay: 0.2s">
@@ -62,84 +61,84 @@
                         <svg class="icone-relogio-hero pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <!-- Horarios de funcionamento do inicio da pagina principal-->
+                        
                         <h3 class="titulo-horario-hero">Horário de Funcionamento</h3>
                         <div class="lista-horarios-hero">
-    <div class="item-horario-hero">
-        <span class="dia-semana-hero">Seg - Qui</span>
-        <span class="hora-funcionamento-hero">08:30 - 17:00</span>
-    </div>
+                            <div class="item-horario-hero">
+                                <span class="dia-semana-hero">Seg - Qui</span>
+                                <span class="hora-funcionamento-hero">08:30 - 17:00</span>
+                            </div>
 
-    <div class="item-horario-hero">
-        <span class="dia-semana-hero">Sex - Sáb</span>
-        <span class="hora-funcionamento-hero">08:30 - 18:00</span>
-    </div>
+                            <div class="item-horario-hero">
+                                <span class="dia-semana-hero">Sex - Sáb</span>
+                                <span class="hora-funcionamento-hero">08:30 - 18:00</span>
+                            </div>
 
-    <div class="item-horario-hero">
-        <span class="dia-semana-hero">Domingo</span>
-        <span class="hora-fechado-hero">Fechado</span>
-    </div>
-</div>
+                            <div class="item-horario-hero">
+                                <span class="dia-semana-hero">Domingo</span>
+                                <span class="hora-fechado-hero">Fechado</span>
+                            </div>
+                        </div>
                         <button onclick="mostrarPagina('agendamento')" class="botao-agendar-hero slide-up" style="animation-delay: 0.4s">
                             ✂️ Agende Seu Horário
                         </button>
                     </div>
                 </div>
             </div>
-            <!-- seção de serviços e preços para o agengamento-->
+            
             <div class="secao-servicos reveal">
                 <h3 class="titulo-secao">Nossos Serviços</h3>
-               <div class="grid-servicos">
+                <div class="grid-servicos">
     
-    <div class="cartao-servico" onclick="agendarServico('Corte e Barba - R$ 35')">
-        <div class="imagem-servico">
-            <img src="assets/corte-barba.jpg" alt="Corte e Barba" class="foto-servico">
-        </div>
-        <h3 class="nome-servico">Corte e Barba</h3>
-        <p class="preco-servico">R$ 35,00</p>
-    </div>
+                    <div class="cartao-servico" onclick="agendarServico('Corte e Barba - R$ 35')">
+                        <div class="imagem-servico">
+                            <img src="assets/corte-barba.jpg" alt="Corte e Barba" class="foto-servico">
+                        </div>
+                        <h3 class="nome-servico">Corte e Barba</h3>
+                        <p class="preco-servico">R$ 35,00</p>
+                    </div>
 
-    <div class="cartao-servico" onclick="agendarServico('Corte Social - R$ 25')">
-        <div class="imagem-servico">
-            <img src="assets/corte-social.jpg" alt="Corte Social" class="foto-servico">
-        </div>
-        <h3 class="nome-servico">Corte Social</h3>
-        <p class="preco-servico">R$ 25,00</p>
-    </div>
+                    <div class="cartao-servico" onclick="agendarServico('Corte Social - R$ 25')">
+                        <div class="imagem-servico">
+                            <img src="assets/corte-social.jpg" alt="Corte Social" class="foto-servico">
+                        </div>
+                        <h3 class="nome-servico">Corte Social</h3>
+                        <p class="preco-servico">R$ 25,00</p>
+                    </div>
 
-    <div class="cartao-servico" onclick="agendarServico('Degradê - R$ 25')">
-        <div class="imagem-servico">
-            <img src="assets/degrade.jpg" alt="Degradê" class="foto-servico">
-        </div>
-        <h3 class="nome-servico">Degradê</h3>
-        <p class="preco-servico">R$ 25,00</p>
-    </div>
+                    <div class="cartao-servico" onclick="agendarServico('Degradê - R$ 25')">
+                        <div class="imagem-servico">
+                            <img src="assets/degrade.jpg" alt="Degradê" class="foto-servico">
+                        </div>
+                        <h3 class="nome-servico">Degradê</h3>
+                        <p class="preco-servico">R$ 25,00</p>
+                    </div>
 
-    <div class="cartao-servico" onclick="agendarServico('Navalhado - R$ 25')">
-        <div class="imagem-servico">
-            <img src="assets/navalhado.jpg" alt="Navalhado" class="foto-servico">
-        </div>
-        <h3 class="nome-servico">Navalhado</h3>
-        <p class="preco-servico">R$ 25,00</p>
-    </div>
+                    <div class="cartao-servico" onclick="agendarServico('Navalhado - R$ 25')">
+                        <div class="imagem-servico">
+                            <img src="assets/navalhado.jpg" alt="Navalhado" class="foto-servico">
+                        </div>
+                        <h3 class="nome-servico">Navalhado</h3>
+                        <p class="preco-servico">R$ 25,00</p>
+                    </div>
 
-    <div class="cartao-servico" onclick="agendarServico('Corte Raspado - R$ 20')">
-        <div class="imagem-servico">
-            <img src="assets/corte-raspado.jpg" alt="Corte Raspado" class="foto-servico">
-        </div>
-        <h3 class="nome-servico">Corte Raspado</h3>
-        <p class="preco-servico">R$ 20,00</p>
-    </div>
+                    <div class="cartao-servico" onclick="agendarServico('Corte Raspado - R$ 20')">
+                        <div class="imagem-servico">
+                            <img src="assets/corte-raspado.jpg" alt="Corte Raspado" class="foto-servico">
+                        </div>
+                        <h3 class="nome-servico">Corte Raspado</h3>
+                        <p class="preco-servico">R$ 20,00</p>
+                    </div>
 
-    <div class="cartao-servico" onclick="agendarServico('Barba e Pezinho - R$ 15')">
-        <div class="imagem-servico">
-            <img src="assets/barba-pezinho.jpg" alt="Barba e Pezinho" class="foto-servico">
-        </div>
-        <h3 class="nome-servico">Barba e Pezinho</h3>
-        <p class="preco-servico">R$ 15,00</p>
-    </div>
+                    <div class="cartao-servico" onclick="agendarServico('Barba e Pezinho - R$ 15')">
+                        <div class="imagem-servico">
+                            <img src="assets/barba-pezinho.jpg" alt="Barba e Pezinho" class="foto-servico">
+                        </div>
+                        <h3 class="nome-servico">Barba e Pezinho</h3>
+                        <p class="preco-servico">R$ 15,00</p>
+                    </div>
 
-</div>
+                </div>
                 
                 <div class="container-botao-servicos reveal">
                     <button onclick="mostrarPagina('agendamento')" class="botao-agendar-servicos pulse">
@@ -168,34 +167,34 @@
                         <label class="label-campo">Escolha seu Barbeiro</label>
                         <div class="grid-barbeiros">
     
-    <label class="cartao-barbeiro">
-        <input type="radio" name="barbeiro" value="1" class="input-radio-barbeiro">
-        <div class="conteudo-barbeiro">
-            <img src="assets/Geilson.jpg" alt="Barbeiro Geilson" class="foto-barbeiro">
-            <span class="nome-barbeiro-card">Geilson</span>
-        </div>
-    </label>
+                            <label class="cartao-barbeiro">
+                                <input type="radio" name="barbeiro" value="1" class="input-radio-barbeiro">
+                                <div class="conteudo-barbeiro">
+                                    <img src="assets/Geilson.jpg" alt="Barbeiro Geilson" class="foto-barbeiro">
+                                    <span class="nome-barbeiro-card">Geilson</span>
+                                </div>
+                            </label>
 
-    <label class="cartao-barbeiro">
-        <input type="radio" name="barbeiro" value="2" class="input-radio-barbeiro">
-        <div class="conteudo-barbeiro">
-            <img src="assets/Denilson.jpg" alt="Barbeiro Denilson" class="foto-barbeiro">
-            <span class="nome-barbeiro-card">Denilson</span>
-        </div>
-    </label>
+                            <label class="cartao-barbeiro">
+                                <input type="radio" name="barbeiro" value="2" class="input-radio-barbeiro">
+                                <div class="conteudo-barbeiro">
+                                    <img src="assets/Denilson.jpg" alt="Barbeiro Denilson" class="foto-barbeiro">
+                                    <span class="nome-barbeiro-card">Denilson</span>
+                                </div>
+                            </label>
 
-</div>
+                        </div>
                     </div>
                     <div class="campo-formulario slide-up" style="animation-delay: 0.3s">
                         <label class="label-campo">Serviço</label>
                         <select id="campoServico" class="select-campo">
                             <option value="">Selecione o serviço...</option>
-        <option value="Corte e Barba - R$ 35">Corte e Barba - R$ 35,00</option>
-        <option value="Corte Social - R$ 25">Corte Social - R$ 25,00</option>
-        <option value="Degradê - R$ 25">Degradê - R$ 25,00</option>
-        <option value="Navalhado - R$ 25">Navalhado - R$ 25,00</option>
-        <option value="Corte Raspado - R$ 20">Corte Raspado - R$ 20,00</option>
-        <option value="Barba e Pezinho - R$ 15">Barba e Pezinho - R$ 15,00</option>
+                            <option value="Corte e Barba - R$ 35">Corte e Barba - R$ 35,00</option>
+                            <option value="Corte Social - R$ 25">Corte Social - R$ 25,00</option>
+                            <option value="Degradê - R$ 25">Degradê - R$ 25,00</option>
+                            <option value="Navalhado - R$ 25">Navalhado - R$ 25,00</option>
+                            <option value="Corte Raspado - R$ 20">Corte Raspado - R$ 20,00</option>
+                            <option value="Barba e Pezinho - R$ 15">Barba e Pezinho - R$ 15,00</option>
                         </select>
                     </div>
 
@@ -224,7 +223,7 @@
                 <div class="caixa-sobre">
                     <h2 class="titulo-sobre">Sobre Nós</h2>
                     <p class="texto-sobre">
-                        A <strong class="destaque-texto">AtualStylus Barbearia</strong> nasceu com o propósito de resgatar a tradição das barbearias clássicas, combinando técnicas tradicionais com o melhor da modernidade.
+                        A <strong class="destaque-texto">AtualEstilo Barbearia</strong> nasceu com o propósito de resgatar a tradição das barbearias clássicas, combinando técnicas tradicionais com o melhor da modernidade.
                     </p>
                     <p class="texto-sobre">
                         Nossa equipe é formada por profissionais altamente qualificados e apaixonados pela arte de cuidar da aparência masculina. Cada corte é executado com precisão e dedicação, garantindo que você saia daqui não apenas com um visual renovado, mas com a autoestima elevada.
@@ -250,13 +249,12 @@
                 </div>
             </div>
         </div>
-
         
     <footer class="rodape">
         <div class="container-rodape">
             <div class="grid-rodape">
                 <div class="coluna-rodape">
-                    <h3 class="titulo-coluna">AtualStylus</h3>
+                    <h3 class="titulo-coluna">AtualEstilo</h3>
                     <p class="texto-coluna">
                         Tradição e estilo em cada corte. Sua barbearia de confiança.
                     </p>
@@ -295,7 +293,6 @@
                         </li>
                     </ul>
                 </div>
-                    <!-- Horarios de funcionamento-->
                 <div class="coluna-rodape">
                     <h3 class="titulo-coluna-branca">Horário</h3>
                     <ul class="lista-horario-rodape">
@@ -314,10 +311,9 @@
                     </ul>
                 </div>
             </div>
-                <!-- Essa parte é o footer o final da pagina-->
             <div class="divisoria-rodape">
                 <div class="container-copyright">
-                    <p class="texto-copyright">© 2026 AtualStylus Barbearia. Todos os direitos reservados.</p> 
+                    <p class="texto-copyright">© 2026 AtualEstilo Barbearia. Todos os direitos reservados.</p> 
                     <div class="redes-sociais">
                         <a href="https://www.instagram.com/atualstyllus/" class="icone-rede-social">
                             <svg class="icone-social" fill="currentColor" viewBox="0 0 24 24">

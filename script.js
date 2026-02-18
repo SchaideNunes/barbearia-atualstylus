@@ -18,14 +18,22 @@ const BARBEIROS = [
     }
 ];
 
+
+// Geilson: Lista completa
 const HORARIOS_GEILSON = [
-    '14:00', '14:30', '15:30', '16:00', '17:00', '17:30'
+    '08:30', '09:30', '10:00', '11:00', 
+    '14:00', '14:30', '15:30', '16:00', 
+    '17:00', '17:30', '18:00', '18:30'
 ];
 
+// Denilson: Lista até as 17:00
 const HORARIOS_DENILSON = [
-    '08:30', '09:30', '10:00', '11:00', '11:30', 
-    '15:30', '16:00', '17:00'
+    '08:30', '09:30', '10:00', '11:00', 
+    '14:00', '14:30', '15:30', '16:00', 
+    '17:00'
 ];
+
+// ---------------------------------
 
 async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
     if (!barbeiroId || !dataSelecionada) return [];
@@ -46,7 +54,8 @@ async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
             .from('agendamentos')
             .select('horario')
             .eq('data_agendamento', dataSelecionada)
-            .eq('barbeiro_id', id);
+            .eq('barbeiro_id', id)
+            .neq('status', 'cancelado'); 
 
         if (error) {
             console.error('Erro Supabase:', error);
@@ -179,6 +188,7 @@ async function confirmarAgendamento() {
     const valorMatch = servico.match(/R\$ (\d+)/);
     const valor = valorMatch ? parseInt(valorMatch[1]) : 0;
 
+
     const textoOriginal = btnConfirmar.innerHTML;
     btnConfirmar.innerHTML = 'Salvando...';
     btnConfirmar.disabled = true;
@@ -213,6 +223,7 @@ async function confirmarAgendamento() {
 
         enviarWhatsApp({ nome, telefone, servico, valor, barbeiroNome, data, horario });
 
+        // Limpa campos
         document.getElementById('campoNome').value = '';
         document.getElementById('campoTelefone').value = '';
         document.getElementById('campoServico').value = '';
@@ -276,7 +287,7 @@ function verificarStatusBotao() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-
+    // Carrega dados salvos do cliente
     const dadosSalvos = localStorage.getItem('dadosClienteBarbearia');
     if (dadosSalvos) {
         const cliente = JSON.parse(dadosSalvos);
@@ -289,6 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Listeners
     const campoData = document.getElementById('campoData');
     if (campoData) campoData.addEventListener('change', atualizarHorariosDisponiveis);
     
