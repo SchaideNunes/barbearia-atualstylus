@@ -541,17 +541,32 @@ html {
             justify-content: center;
             margin-top: 40px;
         }
-        .foto-sobre-card {
-            flex: 1;
-            min-width: 150px;
-            max-width: 250px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid #374151;
-            text-align: center;
-            background: #1f2937;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
+        /* --- Ajuste dos Cartões na Página Sobre Nós --- */
+
+.foto-sobre-card {
+    /* Remove o fundo azulado, deixando transparente */
+    background: transparent !important; 
+    /* Mantém uma borda sutil para definição */
+    border: 1px solid #374151;
+    /* Adiciona uma transição suave para o efeito de hover */
+    transition: all 0.3s ease;
+}
+
+/* Efeito ao passar o mouse sobre o cartão */
+.foto-sobre-card:hover {
+    /* Muda a cor da borda para o dourado da marca */
+    border-color: #fbbf24;
+    /* Adiciona um brilho dourado sutil */
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+    /* Levanta ligeiramente o cartão para um efeito 3D */
+    transform: translateY(-5px);
+}
+
+/* Garante que o nome do barbeiro permaneça dourado e legível */
+.foto-sobre-card span {
+    color: #fbbf24; /* Cor dourada */
+    /* ... mantenha outros estilos de fonte se houver ... */
+}
         .foto-sobre-card img {
             width: 100%;
             height: 280px;
