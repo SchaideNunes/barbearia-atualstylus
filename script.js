@@ -272,17 +272,14 @@ function verificarStatusBotao() {
     }
 }
 
-// --- NOVA FUNÇÃO: MÁSCARA DE WHATSAPP ---
 function aplicarMascaraTelefone(event) {
     let input = event.target;
-    let valor = input.value.replace(/\D/g, ''); // Remove tudo o que não é número
+    let valor = input.value.replace(/\D/g, '');
 
-    // Limita a 11 números no máximo
     if (valor.length > 11) {
         valor = valor.slice(0, 11);
     }
 
-    // Aplica a formatação (XX) XXXXX-XXXX
     if (valor.length > 2) {
         valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
     }
@@ -302,7 +299,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cliente.telefone) document.getElementById('campoTelefone').value = cliente.telefone;
     }
 
-    // Define Data Hoje Inicial
     const campoData = document.getElementById('campoData');
     if (campoData) {
         const hoje = new Date().toISOString().split('T')[0];
@@ -310,8 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
         campoData.value = hoje;
         campoData.addEventListener('change', atualizarHorariosDisponiveis);
     }
-    
-    // Inicia evento de máscara no telefone
+
     const campoTelefone = document.getElementById('campoTelefone');
     if (campoTelefone) {
         campoTelefone.addEventListener('input', aplicarMascaraTelefone);
