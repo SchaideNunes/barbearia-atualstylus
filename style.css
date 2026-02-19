@@ -500,23 +500,32 @@ html {
             margin-bottom: 20px;
         }
 
-        .input-date-custom {
-            background-color: #1f2937 !important;
-            border: 2px solid #374151 !important;
-            color: #fbbf24 !important; /* Texto amarelo */
-            font-weight: bold;
-            padding: 12px;
-            border-radius: 8px;
-            width: 100%;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.3s;
-            text-transform: uppercase;
-        }
-        .input-date-custom:focus {
-            border-color: #fbbf24 !important;
-            box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
-        }
+        /* Novo Design do Input de Data (Fundo Escuro Neutro) */
+.input-date-custom {
+    background-color: #11111100 !important; /* Fundo preto/escuro em vez do azulado */
+    border: 2px solid #333 !important; /* Borda cinza escuro neutro */
+    color: #fbbf24 !important; /* Texto amarelo */
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 8px;
+    width: 100%;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s;
+    text-transform: uppercase;
+}
+
+.input-date-custom:focus {
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+}
+
+/* Deixar o ícone do calendário amarelado */
+::-webkit-calendar-picker-indicator {
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(35deg); 
+    cursor: pointer;
+    transform: scale(1.2);
+}
         /* Deixar o ícone do calendário mais visível/amarelado */
         ::-webkit-calendar-picker-indicator {
             filter: invert(1) sepia(1) saturate(5) hue-rotate(35deg); 
