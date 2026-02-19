@@ -500,11 +500,10 @@ html {
             margin-bottom: 20px;
         }
 
-        /* Novo Design do Input de Data (Fundo Escuro Neutro) */
 .input-date-custom {
-    background-color: #11111100 !important; /* Fundo preto/escuro em vez do azulado */
-    border: 2px solid #333 !important; /* Borda cinza escuro neutro */
-    color: #fbbf24 !important; /* Texto amarelo */
+    background-color: #11111100 !important; 
+    border: 2px solid #333 !important; 
+    color: #fbbf24 !important; 
     font-weight: bold;
     padding: 12px;
     border-radius: 8px;
@@ -520,20 +519,19 @@ html {
     box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
 }
 
-/* Deixar o ícone do calendário amarelado */
+
 ::-webkit-calendar-picker-indicator {
     filter: invert(1) sepia(1) saturate(5) hue-rotate(35deg); 
     cursor: pointer;
     transform: scale(1.2);
 }
-        /* Deixar o ícone do calendário mais visível/amarelado */
+
         ::-webkit-calendar-picker-indicator {
             filter: invert(1) sepia(1) saturate(5) hue-rotate(35deg); 
             cursor: pointer;
             transform: scale(1.2);
         }
 
-        /* Fotos Sobre Nós */
         .fotos-sobre-nos {
             display: flex;
             flex-wrap: wrap;
@@ -541,31 +539,20 @@ html {
             justify-content: center;
             margin-top: 40px;
         }
-        /* --- Ajuste dos Cartões na Página Sobre Nós --- */
-
 .foto-sobre-card {
-    /* Remove o fundo azulado, deixando transparente */
     background: transparent !important; 
-    /* Mantém uma borda sutil para definição */
     border: 1px solid #374151;
-    /* Adiciona uma transição suave para o efeito de hover */
     transition: all 0.3s ease;
 }
 
-/* Efeito ao passar o mouse sobre o cartão */
 .foto-sobre-card:hover {
-    /* Muda a cor da borda para o dourado da marca */
     border-color: #fbbf24;
-    /* Adiciona um brilho dourado sutil */
     box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
-    /* Levanta ligeiramente o cartão para um efeito 3D */
     transform: translateY(-5px);
 }
 
-/* Garante que o nome do barbeiro permaneça dourado e legível */
 .foto-sobre-card span {
-    color: #fbbf24; /* Cor dourada */
-    /* ... mantenha outros estilos de fonte se houver ... */
+    color: #fbbf24; 
 }
         .foto-sobre-card img {
             width: 100%;
