@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin - AtualStylus</title>
+    <title>Painel Admin - AtualEstilo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #111; color: white; font-family: sans-serif; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
         .slot-btn { transition: all 0.2s; }
         .slot-livre { background-color: #1f2937; border: 1px solid #374151; color: #9ca3af; }
         .slot-livre:hover { border-color: #eab308; color: white; }
@@ -29,14 +28,18 @@
             </button>
         </div>
 
-        <div class="flex gap-2 mb-6">
-            <button id="btnPendentes" onclick="mudarAba(false)" 
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button id="btnPendentes" onclick="mudarAba('pendentes')" 
                 class="flex-1 py-3 rounded-lg font-bold text-sm transition border border-yellow-600 bg-yellow-600/20 text-yellow-500 hover:bg-yellow-600 hover:text-white">
-                ⏳ Agendados (Pendentes)
+                ⏳ Pendentes
             </button>
-            <button id="btnConcluidos" onclick="mudarAba(true)" 
+            <button id="btnConcluidos" onclick="mudarAba('concluidos')" 
                 class="flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white">
-                ✅ Histórico (Concluídos)
+                ✅ Concluídos
+            </button>
+            <button id="btnBloqueios" onclick="mudarAba('bloqueios')" 
+                class="flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white">
+                🚫 Bloqueios
             </button>
         </div>
 
@@ -52,7 +55,7 @@
                     <input type="date" id="adminData" class="flex-1 bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
                     <select id="adminHorario" class="w-32 bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
                         <option value="">Horário</option>
-                        </select>
+                    </select>
                 </div>
 
                 <div class="flex gap-2">
@@ -83,10 +86,10 @@
                         🛡️ Bloqueio em Lote
                     </button>
                     <button onclick="criarBloqueio()" class="bg-red-900/50 hover:bg-red-800 text-red-200 border border-red-700 px-4 py-2 rounded text-sm font-bold transition">
-                        🔒 Bloqueio Unitário
+                        🔒 Unitário
                     </button>
                     <button onclick="criarAgendamentoAdmin()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold transition">
-                        ➕ Cadastrar Cliente
+                        ➕ Cadastrar
                     </button>
                 </div>
             </div>
@@ -123,12 +126,8 @@
                 <h3 class="text-xl font-bold text-white flex gap-2 items-center">🛡️ Bloqueio Múltiplo</h3>
                 <button onclick="fecharModalBloqueio()" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
             </div>
-            
             <p id="infoModal" class="text-sm text-yellow-500 mb-4 font-mono"></p>
-
-            <div id="gridHorarios" class="grid grid-cols-4 sm:grid-cols-5 gap-2 mb-6 max-h-[300px] overflow-y-auto p-1">
-                </div>
-
+            <div id="gridHorarios" class="grid grid-cols-4 sm:grid-cols-5 gap-2 mb-6 max-h-[300px] overflow-y-auto p-1"></div>
             <div class="flex justify-between items-center pt-4 border-t border-gray-700">
                 <span id="contadorSelecao" class="text-sm text-gray-400">0 selecionados</span>
                 <div class="flex gap-2">
@@ -149,12 +148,11 @@
         const TODOS_HORARIOS = [
             '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', 
             '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', 
-            '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'
+            '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'
         ];
 
         let cacheAgendamentos = [];
-        let mostrandoConcluidos = false;
-
+        let abaAtiva = 'pendentes'; // 'pendentes', 'concluidos', 'bloqueios'
         let slotsSelecionados = [];
 
         async function iniciarAdmin() {
@@ -176,28 +174,22 @@
                 cacheAgendamentos = agendamentos;
                 aplicarFiltros(); 
             } catch (err) {
-                console.error('Erro:', err);
                 lista.innerHTML = `<p class="text-red-500 text-center">Erro: ${err.message}</p>`;
             }
         }
-
 
         async function abrirModalBloqueio() {
             const data = document.getElementById('adminData').value;
             const barbeiroId = document.getElementById('adminBarbeiro').value;
 
-            if(!data || !barbeiroId) {
-                alert("Por favor, selecione uma DATA e um BARBEIRO na tela principal antes de abrir o bloqueio em lote.");
-                return;
-            }
+            if(!data || !barbeiroId) return alert("Por favor, selecione DATA e BARBEIRO antes de bloquear em lote.");
 
             const barbeiroNome = barbeiroId == 1 ? 'Geilson' : 'Denilson';
             const dataFormatada = new Date(data + 'T00:00:00').toLocaleDateString('pt-BR');
             
             document.getElementById('infoModal').innerHTML = `Bloqueando agenda de <b>${barbeiroNome}</b> para <b>${dataFormatada}</b>`;
-            
             document.getElementById('modalBloqueio').classList.replace('hidden', 'flex');
-            document.getElementById('gridHorarios').innerHTML = '<p class="text-gray-400 text-center col-span-5">Carregando disponibilidade...</p>';
+            document.getElementById('gridHorarios').innerHTML = '<p class="text-gray-400 text-center col-span-5">Carregando...</p>';
             
             const { data: agendamentosDia } = await supabaseClient
                 .from('agendamentos')
@@ -207,7 +199,7 @@
                 .neq('status', 'cancelado');
 
             const horariosOcupados = agendamentosDia.map(a => a.horario);
-            slotsSelecionados = []; 
+            slotsSelecionados = [];
             atualizarGrid(horariosOcupados);
         }
 
@@ -219,19 +211,13 @@
                 const isOcupado = ocupados.includes(horario);
                 const btn = document.createElement('button');
                 btn.innerText = horario;
-                btn.className = `p-2 rounded text-sm font-mono border slot-btn ${
-                    isOcupado ? 'slot-ocupado' : 'slot-livre'
-                }`;
+                btn.className = `p-2 rounded text-sm font-mono border slot-btn ${isOcupado ? 'slot-ocupado' : 'slot-livre'}`;
                 
-                if(isOcupado) {
-                    btn.disabled = true;
-                    btn.title = "Horário já ocupado/bloqueado";
-                } else {
-                    btn.onclick = () => toggleSlot(horario, btn);
-                }
+                if(isOcupado) btn.disabled = true;
+                else btn.onclick = () => toggleSlot(horario, btn);
                 container.appendChild(btn);
             });
-            atualizarContador();
+            document.getElementById('contadorSelecao').innerText = `0 selecionados`;
         }
 
         function toggleSlot(horario, btn) {
@@ -242,11 +228,7 @@
                 slotsSelecionados.push(horario);
                 btn.className = btn.className.replace('slot-livre', 'slot-selecionado');
             }
-            atualizarContador();
-        }
-
-        function atualizarContador() {
-            document.getElementById('contadorSelecao').innerText = `${slotsSelecionados.length} horários selecionados`;
+            document.getElementById('contadorSelecao').innerText = `${slotsSelecionados.length} selecionados`;
         }
 
         function fecharModalBloqueio() {
@@ -255,30 +237,22 @@
 
         async function confirmarBloqueioLote() {
             if(slotsSelecionados.length === 0) return alert("Nenhum horário selecionado.");
-            
             const data = document.getElementById('adminData').value;
             const barbeiroId = document.getElementById('adminBarbeiro').value;
             const barbeiroNome = barbeiroId == 1 ? 'Geilson' : 'Denilson';
 
-            if(!confirm(`Confirma o bloqueio de ${slotsSelecionados.length} horários para ${barbeiroNome}?`)) return;
+            if(!confirm(`Bloquear ${slotsSelecionados.length} horários para ${barbeiroNome}?`)) return;
 
             const inserts = slotsSelecionados.map(horario => ({
-                nome: 'BLOQUEIO',
-                telefone: '',
-                servico: 'BLOQUEIO ADMIN',
-                valor: 0,
-                barbeiro_id: parseInt(barbeiroId),
-                barbeiro_nome: barbeiroNome,
-                data_agendamento: data,
-                horario: horario,
-                status: 'bloqueado'
+                nome: 'BLOQUEIO', telefone: '', servico: 'BLOQUEIO ADMIN', valor: 0,
+                barbeiro_id: parseInt(barbeiroId), barbeiro_nome: barbeiroNome,
+                data_agendamento: data, horario: horario, status: 'bloqueado'
             }));
 
             try {
                 const { error } = await supabaseClient.from('agendamentos').insert(inserts);
                 if(error) throw error;
-                
-                alert("Horários bloqueados com sucesso!");
+                alert("Horários bloqueados!");
                 fecharModalBloqueio();
                 iniciarAdmin();
             } catch(err) {
@@ -286,73 +260,60 @@
             }
         }
 
-
         function renderizarLista(listaDeDados) {
             const divLista = document.getElementById('listaAgendamentos');
-            const contador = document.getElementById('totalRegistros');
-            
-            contador.innerText = `Total: ${listaDeDados ? listaDeDados.length : 0}`;
+            document.getElementById('totalRegistros').innerText = `Total: ${listaDeDados ? listaDeDados.length : 0}`;
 
             if (!listaDeDados || listaDeDados.length === 0) {
-                divLista.innerHTML = `
-                    <div class="text-center py-10 bg-gray-900 rounded-lg border border-gray-700">
-                        <p class="text-xl text-gray-300">Nenhum registro nesta aba.</p>
-                    </div>`;
+                divLista.innerHTML = `<div class="text-center py-10 bg-gray-900 rounded-lg border border-gray-700"><p class="text-xl text-gray-300">Nenhum registro.</p></div>`;
                 return;
             }
 
             divLista.innerHTML = listaDeDados.map(ag => {
                 const dataBR = new Date(ag.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR');
-                const isBloqueio = ag.nome === 'BLOQUEIO' || ag.servico === 'BLOQUEIO ADMIN';
+                const isBloqueio = ag.status === 'bloqueado' || ag.nome === 'BLOQUEIO';
                 const cardClass = isBloqueio ? 'border-red-500/50 bg-red-900/10' : 'border-gray-700 bg-gray-800';
                 
                 return `
-                <div class="${cardClass} p-5 rounded-lg border shadow-lg hover:border-gray-500 transition-all duration-200 fade-in relative">
+                <div class="${cardClass} p-5 rounded-lg border shadow-lg transition-all duration-200 fade-in relative">
                     ${isBloqueio ? '<div class="absolute top-2 right-2 text-xs text-red-400 font-bold border border-red-500 px-2 rounded">BLOQUEADO</div>' : ''}
-                    
                     <div class="flex justify-between items-start mb-4 border-b border-gray-700 pb-3">
                         <div>
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                ${ag.nome}
-                            </h3>
+                            <h3 class="text-lg font-bold text-white">${ag.nome}</h3>
                             <p class="${isBloqueio ? 'text-red-400' : 'text-yellow-500'} text-sm font-medium mt-1">${ag.servico}</p>
                         </div>
                     </div>
-                    
                     <div class="grid grid-cols-2 gap-y-3 text-sm text-gray-300 mb-5">
-                        <div class="flex items-center gap-2"><span class="text-gray-500">📅</span> ${dataBR}</div>
-                        <div class="flex items-center gap-2"><span class="text-gray-500">⏰</span> <span class="font-bold text-white">${ag.horario}</span></div>
-                        <div class="flex items-center gap-2"><span class="text-gray-500">📱</span> ${ag.telefone || '-'}</div>
-                        <div class="flex items-center gap-2"><span class="text-gray-500">✂️</span> ${ag.barbeiro_nome || 'Barbeiro'}</div>
+                        <div class="flex items-center gap-2">📅 ${dataBR}</div>
+                        <div class="flex items-center gap-2">⏰ <span class="font-bold text-white">${ag.horario}</span></div>
+                        <div class="flex items-center gap-2">📱 ${ag.telefone || '-'}</div>
+                        <div class="flex items-center gap-2">✂️ ${ag.barbeiro_nome || 'Barbeiro'}</div>
                     </div>
-
                     <div class="flex justify-end pt-2 gap-3 border-t border-gray-700/50 mt-2">
-                        ${!mostrandoConcluidos && !isBloqueio ? `
-                        <button onclick="concluirAgendamento(${ag.id})" class="flex items-center gap-1 text-green-400 hover:text-green-300 text-sm font-bold hover:bg-green-900/20 px-3 py-1 rounded transition">
-                            ✅ Concluir
-                        </button>
+                        ${abaAtiva === 'pendentes' && !isBloqueio ? `
+                        <button onclick="concluirAgendamento(${ag.id})" class="text-green-400 font-bold hover:bg-green-900/20 px-3 py-1 rounded">✅ Concluir</button>
                         ` : ''}
-
-                        <button onclick="deletarAgendamento(${ag.id})" class="flex items-center gap-1 text-red-400 hover:text-red-300 text-sm font-medium hover:bg-red-900/20 px-3 py-1 rounded transition">
-                            🗑️ ${mostrandoConcluidos ? 'Apagar' : 'Cancelar/Liberar'}
+                        <button onclick="deletarAgendamento(${ag.id})" class="text-red-400 font-medium hover:bg-red-900/20 px-3 py-1 rounded">
+                            🗑️ ${abaAtiva === 'concluidos' ? 'Apagar' : 'Liberar/Cancelar'}
                         </button>
                     </div>
-                </div>
-            `}).join('');
+                </div>`}).join('');
         }
 
-        function mudarAba(verConcluidos) {
-            mostrandoConcluidos = verConcluidos;
-            const btnPendentes = document.getElementById('btnPendentes');
-            const btnConcluidos = document.getElementById('btnConcluidos');
+        // Lógica de 3 abas agora
+        function mudarAba(aba) {
+            abaAtiva = aba;
+            const btnP = document.getElementById('btnPendentes');
+            const btnC = document.getElementById('btnConcluidos');
+            const btnB = document.getElementById('btnBloqueios');
+            
+            // Reseta cores
+            [btnP, btnC, btnB].forEach(b => b.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700");
 
-            if(verConcluidos) {
-                btnConcluidos.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-green-600 bg-green-600/20 text-green-500";
-                btnPendentes.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700";
-            } else {
-                btnPendentes.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-yellow-600 bg-yellow-600/20 text-yellow-500";
-                btnConcluidos.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700";
-            }
+            if(aba === 'pendentes') btnP.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-yellow-600 bg-yellow-600/20 text-yellow-500";
+            if(aba === 'concluidos') btnC.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-green-600 bg-green-600/20 text-green-500";
+            if(aba === 'bloqueios') btnB.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-red-600 bg-red-600/20 text-red-500";
+
             aplicarFiltros();
         }
 
@@ -365,8 +326,17 @@
                 const matchTexto = item.nome.toLowerCase().includes(texto) || item.telefone.includes(texto);
                 const matchData = data ? item.data_agendamento === data : true;
                 const matchBarbeiro = barbeiroId ? item.barbeiro_id == barbeiroId : true;
-                const matchStatus = mostrandoConcluidos ? item.status === 'concluido' : item.status !== 'concluido';
-                return matchTexto && matchData && matchBarbeiro && matchStatus;
+                
+                let matchAba = false;
+                if(abaAtiva === 'pendentes') {
+                    matchAba = item.status !== 'concluido' && item.status !== 'bloqueado' && item.nome !== 'BLOQUEIO';
+                } else if(abaAtiva === 'concluidos') {
+                    matchAba = item.status === 'concluido';
+                } else if(abaAtiva === 'bloqueios') {
+                    matchAba = item.status === 'bloqueado' || item.nome === 'BLOQUEIO';
+                }
+
+                return matchTexto && matchData && matchBarbeiro && matchAba;
             });
             renderizarLista(filtrados);
         }
@@ -381,14 +351,11 @@
         async function concluirAgendamento(id) {
             if(!confirm("Marcar serviço como realizado?")) return;
             try {
-                const { error } = await supabaseClient.from('agendamentos').update({ status: 'concluido' }).eq('id', id);
-                if (error) throw error;
+                await supabaseClient.from('agendamentos').update({ status: 'concluido' }).eq('id', id);
                 const index = cacheAgendamentos.findIndex(ag => ag.id === id);
                 if (index !== -1) cacheAgendamentos[index].status = 'concluido';
                 aplicarFiltros();
-            } catch (error) {
-                alert('Erro: ' + error.message);
-            }
+            } catch (error) {}
         }
 
         async function criarBloqueio() {
@@ -396,8 +363,8 @@
             const horario = document.getElementById('adminHorario').value;
             const barbeiro = document.getElementById('adminBarbeiro').value;
 
-            if(!data || !horario || !barbeiro) return alert("Preencha Data, Horário e Barbeiro para bloquear!");
-            if(!confirm(`Bloquear o horário ${horario} do dia ${data}? Ninguém poderá agendar.`)) return;
+            if(!data || !horario || !barbeiro) return alert("Preencha Data, Horário e Barbeiro!");
+            if(!confirm(`Bloquear horário ${horario} do dia ${data}?`)) return;
             await salvarNoBanco("BLOQUEIO", "", "BLOQUEIO ADMIN", 0, barbeiro, data, horario, false);
         }
 
@@ -419,57 +386,42 @@
         async function salvarNoBanco(nome, telefone, servico, valor, barbeiroId, dataInicial, horario, isRecorrente) {
             const barbeiroNome = barbeiroId == 1 ? 'Geilson' : 'Denilson';
             const inserts = [];
-            const repeticoes = isRecorrente ? 4 : 1;
             let dataAtual = new Date(dataInicial + 'T00:00:00');
+            const repeticoes = isRecorrente ? 4 : 1;
 
             for (let i = 0; i < repeticoes; i++) {
-                const dataStr = dataAtual.toISOString().split('T')[0];
                 inserts.push({
-                    nome: nome,
-                    telefone: telefone,
-                    servico: servico,
-                    valor: valor,
-                    barbeiro_id: parseInt(barbeiroId),
-                    barbeiro_nome: barbeiroNome,
-                    data_agendamento: dataStr,
-                    horario: horario,
-                    status: nome === 'BLOQUEIO' ? 'bloqueado' : 'confirmado'
+                    nome: nome, telefone: telefone, servico: servico, valor: valor,
+                    barbeiro_id: parseInt(barbeiroId), barbeiro_nome: barbeiroNome,
+                    data_agendamento: dataAtual.toISOString().split('T')[0],
+                    horario: horario, status: nome === 'BLOQUEIO' ? 'bloqueado' : 'confirmado'
                 });
                 dataAtual.setDate(dataAtual.getDate() + 7);
             }
 
             try {
-                const { error } = await supabaseClient.from('agendamentos').insert(inserts);
-                if (error) throw error;
-                alert(isRecorrente ? 'Agendamentos fixos criados (4 semanas)!' : 'Salvo com sucesso!');
+                await supabaseClient.from('agendamentos').insert(inserts);
+                alert('Salvo com sucesso!');
                 document.getElementById('adminNome').value = '';
                 document.getElementById('adminTelefone').value = '';
-                document.getElementById('checkRecorrente').checked = false;
                 iniciarAdmin();
-            } catch (err) {
-                alert('Erro ao salvar: ' + err.message);
-            }
+            } catch (err) { alert('Erro: ' + err.message); }
         }
 
         async function deletarAgendamento(id) {
             if(!confirm("Tem certeza que deseja apagar?")) return;
             try {
-                const { error } = await supabaseClient.from('agendamentos').delete().eq('id', id);
-                if (error) throw error;
+                await supabaseClient.from('agendamentos').delete().eq('id', id);
                 cacheAgendamentos = cacheAgendamentos.filter(ag => ag.id !== id);
                 aplicarFiltros();
-            } catch (error) {
-                alert('Erro ao deletar: ' + error.message);
-            }
+            } catch (error) {}
         }
 
         function carregarHorariosAdmin() {
             const select = document.getElementById('adminHorario');
             select.innerHTML = '<option value="">Horário</option>';
             TODOS_HORARIOS.forEach(h => {
-                const opt = document.createElement('option');
-                opt.value = h;
-                opt.innerText = h;
+                const opt = document.createElement('option'); opt.value = h; opt.innerText = h;
                 select.appendChild(opt);
             });
         }

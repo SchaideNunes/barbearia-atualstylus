@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AtualEstilo Barbearia</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body class="corpo-site">
     <header class="cabecalho">
@@ -150,21 +150,15 @@
 
         <div id="paginaAgendamento" class="pagina">
             <div class="container-agendamento fade-in">
-                <h2 class="titulo-agendamento">Agende seu Horário</h2>
+                
+                <div class="header-agendamento-sticky">
+                    <h2 class="titulo-agendamento" style="margin: 0;">Agende seu Horário</h2>
+                </div>
                 
                 <div class="formulario-agendamento">
+                    
                     <div class="campo-formulario slide-up">
-                        <label class="label-campo">Nome Completo</label>
-                        <input type="text" id="campoNome" class="input-campo" placeholder="Seu nome">
-                    </div>
-
-                    <div class="campo-formulario slide-up" style="animation-delay: 0.1s">
-                        <label class="label-campo">WhatsApp</label>
-                        <input type="tel" id="campoTelefone" class="input-campo" placeholder="(00) 00000-0000">
-                    </div>
-
-                    <div class="campo-formulario slide-up" style="animation-delay: 0.2s">
-                        <label class="label-campo">Escolha seu Barbeiro</label>
+                        <label class="label-campo">1. Escolha seu Barbeiro</label>
                         <div class="grid-barbeiros">
     
                             <label class="cartao-barbeiro">
@@ -185,8 +179,23 @@
 
                         </div>
                     </div>
+
+                    <div class="campo-formulario slide-up" style="animation-delay: 0.1s">
+                        <label class="label-campo">2. Data</label>
+                        <input type="date" id="campoData" class="input-campo input-date-custom">
+                    </div>
+
+                    <div class="campo-formulario slide-up" style="animation-delay: 0.2s">
+                        <label class="label-campo">
+                            3. Horário <span style="font-size: 0.75rem; color: #9ca3af; font-weight: normal; margin-left: 8px;">*Os horários variam por barbeiro</span>
+                        </label>
+                        <select id="campoHorario" class="select-campo">
+                            <option value="">Primeiro selecione data e barbeiro</option>
+                        </select>
+                    </div>
+
                     <div class="campo-formulario slide-up" style="animation-delay: 0.3s">
-                        <label class="label-campo">Serviço</label>
+                        <label class="label-campo">4. Serviço</label>
                         <select id="campoServico" class="select-campo">
                             <option value="">Selecione o serviço...</option>
                             <option value="Corte e Barba - R$ 35">Corte e Barba - R$ 35,00</option>
@@ -199,16 +208,13 @@
                     </div>
 
                     <div class="campo-formulario slide-up" style="animation-delay: 0.4s">
-                        <label class="label-campo">Data</label>
-                        <input type="date" id="campoData" class="input-campo">
+                        <label class="label-campo">5. Nome Completo</label>
+                        <input type="text" id="campoNome" class="input-campo" placeholder="Seu nome">
                     </div>
 
                     <div class="campo-formulario slide-up" style="animation-delay: 0.5s">
-                        <label class="label-campo">Horário</label>
-                        <select id="campoHorario" class="select-campo">
-                            <option value="">Primeiro selecione data e barbeiro</option>
-                        </select>
-                        <p class="texto-info-horario">Os horários disponíveis variam por barbeiro</p>
+                        <label class="label-campo">6. WhatsApp</label>
+                        <input type="tel" id="campoTelefone" class="input-campo" placeholder="(00) 00000-0000" maxlength="15">
                     </div>
 
                     <button onclick="confirmarAgendamento()" class="botao-confirmar slide-up" style="animation-delay: 0.6s">
@@ -231,6 +237,17 @@
                     <p class="texto-sobre">
                         Venha nos visitar e descubra por que somos referência em estilo e qualidade na região!
                     </p>
+
+                    <div class="fotos-sobre-nos">
+                        <div class="foto-sobre-card">
+                            <img src="assets/Geilson.jpg" alt="Barbeiro Geilson">
+                            <span>Geilson</span>
+                        </div>
+                        <div class="foto-sobre-card">
+                            <img src="assets/Denilson.jpg" alt="Barbeiro Denilson">
+                            <span>Denilson</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid-valores">
@@ -330,8 +347,8 @@
             </div>
         </div>
     </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
 </html>

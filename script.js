@@ -6,34 +6,21 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const WHATSAPP_BARBEARIA = '5575991309594';
 
 const BARBEIROS = [
-    { 
-        id: 1, 
-        nome: 'Geilson', 
-        foto: 'assets/Geilson.jpg'
-    },
-    { 
-        id: 2, 
-        nome: 'Denilson', 
-        foto: 'assets/Denilson.jpg'
-    }
+    { id: 1, nome: 'Geilson', foto: 'assets/Geilson.jpg' },
+    { id: 2, nome: 'Denilson', foto: 'assets/Denilson.jpg' }
 ];
 
-
-// Geilson: Lista completa
 const HORARIOS_GEILSON = [
     '08:30', '09:30', '10:00', '11:00', 
     '14:00', '14:30', '15:30', '16:00', 
     '17:00', '17:30', '18:00', '18:30'
 ];
 
-// Denilson: Lista até as 17:00
 const HORARIOS_DENILSON = [
     '08:30', '09:30', '10:00', '11:00', 
     '14:00', '14:30', '15:30', '16:00', 
     '17:00'
 ];
-
-// ---------------------------------
 
 async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
     if (!barbeiroId || !dataSelecionada) return [];
@@ -41,13 +28,9 @@ async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
     const id = parseInt(barbeiroId);
     let listaHorariosDoBarbeiro = [];
 
-    if (id === 1) {
-        listaHorariosDoBarbeiro = HORARIOS_GEILSON;
-    } else if (id === 2) {
-        listaHorariosDoBarbeiro = HORARIOS_DENILSON;
-    } else {
-        return [];
-    }
+    if (id === 1) listaHorariosDoBarbeiro = HORARIOS_GEILSON;
+    else if (id === 2) listaHorariosDoBarbeiro = HORARIOS_DENILSON;
+    else return [];
 
     try {
         const { data: agendamentos, error } = await supabaseClient
@@ -63,7 +46,6 @@ async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
         }
 
         const horariosOcupados = agendamentos.map(ag => ag.horario);
-        
         return listaHorariosDoBarbeiro.filter(h => !horariosOcupados.includes(h));
 
     } catch (err) {
@@ -100,8 +82,15 @@ function mostrarPagina(nomePagina) {
     document.getElementById('iconeFechar').classList.add('hidden');
 
     if (nomePagina === 'agendamento') {
+        const campoData = document.getElementById('campoData');
         const hoje = new Date().toISOString().split('T')[0];
-        document.getElementById('campoData').min = hoje;
+        campoData.min = hoje;
+        
+        // Coloca a data de HOJE como padrão se estiver vazia
+        if (!campoData.value) {
+            campoData.value = hoje;
+        }
+        
         atualizarHorariosDisponiveis();
     }
     
@@ -140,7 +129,7 @@ async function atualizarHorariosDisponiveis() {
     campoHorario.disabled = true;
 
     if (!dataSelecionada || !barbeiroId) {
-        campoHorario.innerHTML = '<option value="">Selecione data e barbeiro</option>';
+        campoHorario.innerHTML = '<option value="">Primeiro selecione data e barbeiro</option>';
         campoHorario.disabled = false;
         return;
     }
@@ -188,7 +177,6 @@ async function confirmarAgendamento() {
     const valorMatch = servico.match(/R\$ (\d+)/);
     const valor = valorMatch ? parseInt(valorMatch[1]) : 0;
 
-
     const textoOriginal = btnConfirmar.innerHTML;
     btnConfirmar.innerHTML = 'Salvando...';
     btnConfirmar.disabled = true;
@@ -223,11 +211,10 @@ async function confirmarAgendamento() {
 
         enviarWhatsApp({ nome, telefone, servico, valor, barbeiroNome, data, horario });
 
-        // Limpa campos
         document.getElementById('campoNome').value = '';
         document.getElementById('campoTelefone').value = '';
         document.getElementById('campoServico').value = '';
-        document.getElementById('campoData').value = '';
+        document.getElementById('campoData').value = new Date().toISOString().split('T')[0]; // Reseta para hoje
         barbeiroRadio.checked = false;
         await atualizarHorariosDisponiveis();
         
@@ -243,7 +230,6 @@ async function confirmarAgendamento() {
 }
 
 function enviarWhatsApp(agendamento) {
-    const telefoneClean = agendamento.telefone.replace(/\D/g, '');
     const dataFormatada = new Date(agendamento.data + 'T00:00:00').toLocaleDateString('pt-BR');
     
     const mensagem = `🔔 *NOVO AGENDAMENTO* 🔔
@@ -286,23 +272,50 @@ function verificarStatusBotao() {
     }
 }
 
+// --- NOVA FUNÇÃO: MÁSCARA DE WHATSAPP ---
+function aplicarMascaraTelefone(event) {
+    let input = event.target;
+    let valor = input.value.replace(/\D/g, ''); // Remove tudo o que não é número
+
+    // Limita a 11 números no máximo
+    if (valor.length > 11) {
+        valor = valor.slice(0, 11);
+    }
+
+    // Aplica a formatação (XX) XXXXX-XXXX
+    if (valor.length > 2) {
+        valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
+    }
+    if (valor.length > 10) {
+        valor = `${valor.slice(0, 10)}-${valor.slice(10)}`;
+    }
+
+    input.value = valor;
+    verificarStatusBotao();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Carrega dados salvos do cliente
     const dadosSalvos = localStorage.getItem('dadosClienteBarbearia');
     if (dadosSalvos) {
         const cliente = JSON.parse(dadosSalvos);
-        
-        if (cliente.nome) {
-            document.getElementById('campoNome').value = cliente.nome;
-        }
-        if (cliente.telefone) {
-            document.getElementById('campoTelefone').value = cliente.telefone;
-        }
+        if (cliente.nome) document.getElementById('campoNome').value = cliente.nome;
+        if (cliente.telefone) document.getElementById('campoTelefone').value = cliente.telefone;
     }
 
-    // Listeners
+    // Define Data Hoje Inicial
     const campoData = document.getElementById('campoData');
-    if (campoData) campoData.addEventListener('change', atualizarHorariosDisponiveis);
+    if (campoData) {
+        const hoje = new Date().toISOString().split('T')[0];
+        campoData.min = hoje;
+        campoData.value = hoje;
+        campoData.addEventListener('change', atualizarHorariosDisponiveis);
+    }
+    
+    // Inicia evento de máscara no telefone
+    const campoTelefone = document.getElementById('campoTelefone');
+    if (campoTelefone) {
+        campoTelefone.addEventListener('input', aplicarMascaraTelefone);
+    }
     
     const barbeiroRadios = document.querySelectorAll('input[name="barbeiro"]');
     barbeiroRadios.forEach(radio => {
