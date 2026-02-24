@@ -2,7 +2,15 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Painel Admin - AtualEstilo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -161,7 +169,7 @@
               class="w-4 h-4 rounded text-yellow-500 focus:ring-yellow-500 bg-gray-700 border-gray-500"
             />
             <span class="text-sm text-gray-300"
-              >Repetir por 4 semanas (Cliente Fixo)</span
+              >Cliente Fixo (Toda semana durante 1 ano)</span
             >
           </label>
 
@@ -661,7 +669,9 @@
         const barbeiroNome = barbeiroId == 1 ? "Geilson" : "Denilson";
         const inserts = [];
         let dataAtual = new Date(dataInicial + "T00:00:00");
-        const repeticoes = isRecorrente ? 4 : 1;
+
+        // Se for fixo, repete 52 vezes (1 ano inteiro). Se não, apenas 1 vez.
+        const repeticoes = isRecorrente ? 52 : 1;
 
         for (let i = 0; i < repeticoes; i++) {
           inserts.push({
@@ -675,6 +685,8 @@
             horario: horario,
             status: nome === "BLOQUEIO" ? "bloqueado" : "confirmado",
           });
+
+          // Adiciona 7 dias exatos para o próximo agendamento
           dataAtual.setDate(dataAtual.getDate() + 7);
         }
 
