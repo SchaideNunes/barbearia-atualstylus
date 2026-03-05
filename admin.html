@@ -471,69 +471,121 @@
       }
 
       function renderizarLista(listaDeDados) {
-    const divLista = document.getElementById('listaAgendamentos');
-    document.getElementById('totalRegistros').innerText = `Total: ${listaDeDados ? listaDeDados.length : 0}`;
+        const divLista = document.getElementById("listaAgendamentos");
+        document.getElementById("totalRegistros").innerText =
+          `Total: ${listaDeDados ? listaDeDados.length : 0}`;
 
-    if (!listaDeDados || listaDeDados.length === 0) {
-        divLista.innerHTML = `<div class="text-center py-10 bg-gray-900 rounded-lg border border-gray-700"><p class="text-xl text-gray-300">Nenhum registro encontrado.</p></div>`;
-        return;
-    }
+        if (!listaDeDados || listaDeDados.length === 0) {
+          divLista.innerHTML = `<div class="text-center py-10 bg-gray-900 rounded-lg border border-gray-700 shadow-lg"><p class="text-xl text-gray-400">Nenhum agendamento para mostrar.</p></div>`;
+          return;
+        }
 
-    // Cria o cabeçalho da Tabela
-    let html = `
-    <div class="overflow-x-auto rounded-lg border border-gray-700 shadow-lg">
-        <table class="w-full text-left text-sm text-gray-300">
-            <thead class="bg-gray-900 text-xs uppercase text-gray-400 border-b border-gray-700">
-                <tr>
-                    <th scope="col" class="px-4 py-4">Data / Hora</th>
-                    <th scope="col" class="px-4 py-4">Cliente / Contato</th>
-                    <th scope="col" class="px-4 py-4">Serviço</th>
-                    <th scope="col" class="px-4 py-4">Barbeiro</th>
-                    <th scope="col" class="px-4 py-4 text-right">Ações</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-700">
-    `;
+        // 1. Primeiro, ordenamos tudo por data e depois por horário
+        listaDeDados.sort((a, b) => {
+          if (a.data_agendamento === b.data_agendamento) {
+            return a.horario.localeCompare(b.horario);
+          }
+          return a.data_agendamento.localeCompare(b.data_agendamento);
+        });
 
-    // Preenche as linhas da Tabela
-    listaDeDados.forEach(ag => {
-        const dataBR = new Date(ag.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR');
-        const isBloqueio = ag.status === 'bloqueado' || ag.nome === 'BLOQUEIO';
-        const rowClass = isBloqueio ? 'bg-red-900/10 hover:bg-red-900/20' : 'bg-gray-800 hover:bg-gray-700';
-        const textColor = isBloqueio ? 'text-red-400' : 'text-white';
+        // 2. Agrupamos os agendamentos pelo Dia (para criar os blocos do calendário)
+        const agrupadosPorData = {};
+        listaDeDados.forEach((ag) => {
+          if (!agrupadosPorData[ag.data_agendamento]) {
+            agrupadosPorData[ag.data_agendamento] = [];
+          }
+          agrupadosPorData[ag.data_agendamento].push(ag);
+        });
 
-        html += `
-            <tr class="${rowClass} transition-colors">
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <div class="font-bold ${textColor}">${dataBR}</div>
-                    <div class="text-xs text-yellow-500 mt-1">⏰ ${ag.horario}</div>
-                </td>
-                <td class="px-4 py-3">
-                    <div class="font-bold ${textColor}">
-                        ${ag.nome}
-                        ${isBloqueio ? '<span class="ml-2 text-[10px] bg-red-600/20 text-red-500 px-2 py-0.5 rounded border border-red-500/30">BLOQUEADO</span>' : ''}
+        // 3. Desenhamos o HTML da Agenda
+        let html = '<div class="space-y-8">'; // Espaçamento grande entre dias diferentes
+
+        for (const data in agrupadosPorData) {
+          // Criar a data legível (Ex: "quinta-feira", "15 de março de 2026")
+          const dataObj = new Date(data + "T00:00:00");
+          const diaSemana = dataObj.toLocaleDateString("pt-BR", {
+            weekday: "long",
+          });
+          const dataExtenso = dataObj.toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          });
+
+          html += `
+        <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-2xl">
+            
+            <div class="bg-gray-900 px-6 py-4 border-b border-gray-700 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                <div>
+                    <h3 class="text-xl font-bold text-yellow-500 capitalize">📅 ${diaSemana}</h3>
+                    <p class="text-sm text-gray-400">${dataExtenso}</p>
+                </div>
+                <span class="bg-gray-700 border border-gray-600 text-gray-300 text-xs px-3 py-1.5 rounded-full font-bold shadow-sm inline-block w-max">
+                    ${agrupadosPorData[data].length} agendamento(s)
+                </span>
+            </div>
+            
+            <div class="divide-y divide-gray-700/50">
+        `;
+
+          agrupadosPorData[data].forEach((ag) => {
+            const isBloqueio =
+              ag.status === "bloqueado" || ag.nome === "BLOQUEIO";
+            const rowClass = isBloqueio
+              ? "bg-red-900/10 hover:bg-red-900/20"
+              : "hover:bg-gray-700/30";
+            const borderLeft = isBloqueio
+              ? "border-l-4 border-red-500"
+              : "border-l-4 border-yellow-500";
+
+            html += `
+                <div class="${rowClass} ${borderLeft} p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-200">
+                    
+                    <div class="flex items-start sm:items-center gap-4">
+                        <div class="bg-gray-900 border border-gray-700 rounded-lg p-3 text-center min-w-[85px] shadow-inner">
+                            <span class="block text-xl font-black text-white">${ag.horario}</span>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-lg font-bold ${isBloqueio ? "text-red-400" : "text-gray-100"} flex items-center gap-2 flex-wrap">
+                                ${ag.nome}
+                                ${isBloqueio ? '<span class="text-[10px] bg-red-600/20 text-red-500 px-2 py-0.5 rounded border border-red-500/30 uppercase tracking-wider">Bloqueado</span>' : ""}
+                            </h4>
+                            <div class="text-sm text-gray-400 mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1">
+                                ${ag.telefone ? `<span class="flex items-center gap-1">📱 ${ag.telefone}</span>` : ""}
+                                <span class="flex items-center gap-1">✂️ ${ag.barbeiro_nome || "-"}</span>
+                                ${ag.servico ? `<span class="hidden sm:inline text-gray-600">•</span><span class="text-yellow-600/80 font-medium">${ag.servico}</span>` : ""}
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-xs text-gray-400 mt-1">📱 ${ag.telefone || '-'}</div>
-                </td>
-                <td class="px-4 py-3 font-medium text-gray-300">${ag.servico}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-300">✂️ ${ag.barbeiro_nome || '-'}</td>
-                <td class="px-4 py-3 text-right whitespace-nowrap">
-                    <div class="flex justify-end gap-3">
-                        ${abaAtiva === 'pendentes' && !isBloqueio ? `
-                            <button onclick="concluirAgendamento(${ag.id})" class="text-green-400 hover:text-green-300 bg-green-900/20 px-3 py-1 rounded border border-green-800 transition" title="Concluir">✅ Concluir</button>
-                        ` : ''}
-                        <button onclick="deletarAgendamento(${ag.id})" class="text-red-400 hover:text-red-300 bg-red-900/20 px-3 py-1 rounded border border-red-800 transition" title="${abaAtiva === 'concluidos' ? 'Apagar' : 'Cancelar / Liberar'}">
-                            🗑️ ${abaAtiva === 'concluidos' ? 'Apagar' : 'Liberar'}
+
+                    <div class="flex flex-wrap md:flex-nowrap gap-2 shrink-0">
+                        ${
+                          abaAtiva === "pendentes" && !isBloqueio
+                            ? `
+                            <button onclick="concluirAgendamento(${ag.id})" class="flex-1 md:flex-none justify-center text-green-400 hover:text-white bg-green-900/20 hover:bg-green-600 px-4 py-2.5 rounded-lg border border-green-800 transition-colors shadow-sm flex items-center gap-2 text-sm font-bold" title="Marcar como Concluído">
+                                ✅ Concluir
+                            </button>
+                        `
+                            : ""
+                        }
+                        <button onclick="deletarAgendamento(${ag.id})" class="flex-1 md:flex-none justify-center text-red-400 hover:text-white bg-red-900/20 hover:bg-red-600 px-4 py-2.5 rounded-lg border border-red-800 transition-colors shadow-sm flex items-center gap-2 text-sm font-bold" title="${abaAtiva === "concluidos" ? "Apagar permanentemente" : "Cancelar e liberar horário"}">
+                            🗑️ ${abaAtiva === "concluidos" ? "Apagar" : "Liberar"}
                         </button>
                     </div>
-                </td>
-            </tr>
-        `;
-    });
+                </div>
+            `;
+          });
 
-    html += `</tbody></table></div>`;
-    divLista.innerHTML = html;
-}
+          html += `
+            </div>
+        </div>
+        `;
+        }
+
+        html += "</div>";
+        divLista.innerHTML = html;
+      }
 
       // Lógica de 3 abas agora
       function mudarAba(aba) {
@@ -577,11 +629,11 @@
             : true;
 
           let matchAba = false;
+
+          // --- A MÁGICA ACONTECE AQUI ---
           if (abaAtiva === "pendentes") {
-            matchAba =
-              item.status !== "concluido" &&
-              item.status !== "bloqueado" &&
-              item.nome !== "BLOQUEIO";
+            // Agora só mostra estritamente quem está 'confirmado'
+            matchAba = item.status === "confirmado" && item.nome !== "BLOQUEIO";
           } else if (abaAtiva === "concluidos") {
             matchAba = item.status === "concluido";
           } else if (abaAtiva === "bloqueios") {
@@ -590,6 +642,7 @@
 
           return matchTexto && matchData && matchBarbeiro && matchAba;
         });
+
         renderizarLista(filtrados);
       }
 
