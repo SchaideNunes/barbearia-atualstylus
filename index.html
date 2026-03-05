@@ -33,6 +33,7 @@
                     <button onclick="mostrarPagina('inicio')" class="link-menu ativo">Início</button>
                     <button onclick="mostrarPagina('agendamento')" class="link-menu">Agendar</button>
                     <button onclick="mostrarPagina('sobre')" class="link-menu">Sobre Nós</button>
+                    <button onclick="mostrarPagina('meusAgendamentos')" class="link-menu">Meus Agendamentos</button>
                 </nav>
             </div>
 
@@ -40,6 +41,7 @@
                 <button onclick="mostrarPagina('inicio')" class="item-menu-mobile">Início</button>
                 <button onclick="mostrarPagina('agendamento')" class="item-menu-mobile">Agendar</button>
                 <button onclick="mostrarPagina('sobre')" class="item-menu-mobile">Sobre Nós</button>
+                <button onclick="mostrarPagina('meusAgendamentos')" class="link-menu">Meus Agendamentos</button>
             </nav>
         </div>
     </header>
@@ -272,6 +274,30 @@
             </div>
         </div>
         
+<div id="paginaMeusAgendamentos" class="pagina">
+            <div class="container-agendamento fade-in">
+                <div class="header-agendamento-sticky">
+                    <h2 class="titulo-agendamento" style="margin: 0;">Meus Agendamentos</h2>
+                </div>
+                
+                <div class="formulario-agendamento">
+                    <p class="texto-info-horario mb-4 text-center">Digite o seu WhatsApp para buscar e cancelar os seus agendamentos pendentes.</p>
+                    
+                    <div class="campo-formulario">
+                        <label class="label-campo">Seu WhatsApp</label>
+                        <input type="tel" id="buscaTelefoneCliente" class="input-campo" placeholder="(00) 00000-0000" maxlength="15" oninput="aplicarMascaraTelefone(event)">
+                    </div>
+                    
+                    <button onclick="buscarMeusAgendamentos()" class="botao-confirmar" style="margin-bottom: 30px;">
+                        🔍 Buscar Agendamentos
+                    </button>
+
+                    <div id="listaMeusAgendamentos" class="space-y-4">
+                        </div>
+                </div>
+            </div>
+        </div>
+
     <footer class="rodape">
         <div class="container-rodape">
             <div class="grid-rodape">

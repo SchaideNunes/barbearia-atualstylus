@@ -386,3 +386,76 @@ document.addEventListener("DOMContentLoaded", function () {
   verificarStatusBotao();
   revelarNoScroll();
 });
+
+// Função para o cliente buscar os seus agendamentos
+async function buscarMeusAgendamentos() {
+    const telefoneInput = document.getElementById('buscaTelefoneCliente').value;
+    const divLista = document.getElementById('listaMeusAgendamentos');
+    
+    if (telefoneInput.length < 14) {
+        alert("Por favor, insira um número de WhatsApp válido.");
+        return;
+    }
+
+    divLista.innerHTML = '<p class="texto-info-horario text-center">Buscando...</p>';
+
+    try {
+        const hoje = new Date().toISOString().split('T')[0];
+        
+        // Procura agendamentos do cliente que sejam de hoje em diante e estejam confirmados
+        const { data: agendamentos, error } = await supabaseClient
+            .from('agendamentos')
+            .select('*')
+            .eq('telefone', telefoneInput)
+            .eq('status', 'confirmado')
+            .gte('data_agendamento', hoje)
+            .order('data_agendamento', { ascending: true });
+
+        if (error) throw error;
+
+        if (agendamentos.length === 0) {
+            divLista.innerHTML = '<p class="texto-info-horario text-center" style="color: #fca5a5;">Nenhum agendamento pendente encontrado para este número.</p>';
+            return;
+        }
+
+        // Desenha os cards para o cliente
+        divLista.innerHTML = agendamentos.map(ag => {
+            const dataBR = new Date(ag.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR');
+            return `
+            <div style="background-color: #1f2937; border: 1px solid #374151; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <h4 style="color: #fbbf24; margin-bottom: 10px; font-weight: bold;">${ag.servico}</h4>
+                <p style="color: #d1d5db; font-size: 0.9rem; margin-bottom: 5px;">📅 Data: <strong>${dataBR}</strong> às <strong>${ag.horario}</strong></p>
+                <p style="color: #d1d5db; font-size: 0.9rem; margin-bottom: 15px;">✂️ Barbeiro: <strong>${ag.barbeiro_nome}</strong></p>
+                <button onclick="cancelarAgendamentoCliente(${ag.id})" style="background-color: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; padding: 8px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s;">
+                    ❌ Cancelar Agendamento
+                </button>
+            </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        divLista.innerHTML = `<p style="color: red; text-align: center;">Erro na busca: ${err.message}</p>`;
+    }
+}
+
+// Função para o cliente cancelar o agendamento
+async function cancelarAgendamentoCliente(id) {
+    if(!confirm("Tem certeza que deseja cancelar este agendamento? O horário será liberado imediatamente.")) return;
+    
+    try {
+        // Altera o status para 'cancelado' (assim libera o horário no calendário)
+        const { error } = await supabaseClient
+            .from('agendamentos')
+            .update({ status: 'cancelado' })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        alert("✅ Agendamento cancelado com sucesso!");
+        // Atualiza a lista
+        buscarMeusAgendamentos(); 
+        
+    } catch (err) {
+        alert("Erro ao tentar cancelar: " + err.message);
+    }
+}

@@ -471,57 +471,69 @@
       }
 
       function renderizarLista(listaDeDados) {
-        const divLista = document.getElementById("listaAgendamentos");
-        document.getElementById("totalRegistros").innerText =
-          `Total: ${listaDeDados ? listaDeDados.length : 0}`;
+    const divLista = document.getElementById('listaAgendamentos');
+    document.getElementById('totalRegistros').innerText = `Total: ${listaDeDados ? listaDeDados.length : 0}`;
 
-        if (!listaDeDados || listaDeDados.length === 0) {
-          divLista.innerHTML = `<div class="text-center py-10 bg-gray-900 rounded-lg border border-gray-700"><p class="text-xl text-gray-300">Nenhum registro.</p></div>`;
-          return;
-        }
+    if (!listaDeDados || listaDeDados.length === 0) {
+        divLista.innerHTML = `<div class="text-center py-10 bg-gray-900 rounded-lg border border-gray-700"><p class="text-xl text-gray-300">Nenhum registro encontrado.</p></div>`;
+        return;
+    }
 
-        divLista.innerHTML = listaDeDados
-          .map((ag) => {
-            const dataBR = new Date(
-              ag.data_agendamento + "T00:00:00",
-            ).toLocaleDateString("pt-BR");
-            const isBloqueio =
-              ag.status === "bloqueado" || ag.nome === "BLOQUEIO";
-            const cardClass = isBloqueio
-              ? "border-red-500/50 bg-red-900/10"
-              : "border-gray-700 bg-gray-800";
+    // Cria o cabeçalho da Tabela
+    let html = `
+    <div class="overflow-x-auto rounded-lg border border-gray-700 shadow-lg">
+        <table class="w-full text-left text-sm text-gray-300">
+            <thead class="bg-gray-900 text-xs uppercase text-gray-400 border-b border-gray-700">
+                <tr>
+                    <th scope="col" class="px-4 py-4">Data / Hora</th>
+                    <th scope="col" class="px-4 py-4">Cliente / Contato</th>
+                    <th scope="col" class="px-4 py-4">Serviço</th>
+                    <th scope="col" class="px-4 py-4">Barbeiro</th>
+                    <th scope="col" class="px-4 py-4 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+    `;
 
-            return `
-                <div class="${cardClass} p-5 rounded-lg border shadow-lg transition-all duration-200 fade-in relative">
-                    ${isBloqueio ? '<div class="absolute top-2 right-2 text-xs text-red-400 font-bold border border-red-500 px-2 rounded">BLOQUEADO</div>' : ""}
-                    <div class="flex justify-between items-start mb-4 border-b border-gray-700 pb-3">
-                        <div>
-                            <h3 class="text-lg font-bold text-white">${ag.nome}</h3>
-                            <p class="${isBloqueio ? "text-red-400" : "text-yellow-500"} text-sm font-medium mt-1">${ag.servico}</p>
-                        </div>
+    // Preenche as linhas da Tabela
+    listaDeDados.forEach(ag => {
+        const dataBR = new Date(ag.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR');
+        const isBloqueio = ag.status === 'bloqueado' || ag.nome === 'BLOQUEIO';
+        const rowClass = isBloqueio ? 'bg-red-900/10 hover:bg-red-900/20' : 'bg-gray-800 hover:bg-gray-700';
+        const textColor = isBloqueio ? 'text-red-400' : 'text-white';
+
+        html += `
+            <tr class="${rowClass} transition-colors">
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <div class="font-bold ${textColor}">${dataBR}</div>
+                    <div class="text-xs text-yellow-500 mt-1">⏰ ${ag.horario}</div>
+                </td>
+                <td class="px-4 py-3">
+                    <div class="font-bold ${textColor}">
+                        ${ag.nome}
+                        ${isBloqueio ? '<span class="ml-2 text-[10px] bg-red-600/20 text-red-500 px-2 py-0.5 rounded border border-red-500/30">BLOQUEADO</span>' : ''}
                     </div>
-                    <div class="grid grid-cols-2 gap-y-3 text-sm text-gray-300 mb-5">
-                        <div class="flex items-center gap-2">📅 ${dataBR}</div>
-                        <div class="flex items-center gap-2">⏰ <span class="font-bold text-white">${ag.horario}</span></div>
-                        <div class="flex items-center gap-2">📱 ${ag.telefone || "-"}</div>
-                        <div class="flex items-center gap-2">✂️ ${ag.barbeiro_nome || "Barbeiro"}</div>
-                    </div>
-                    <div class="flex justify-end pt-2 gap-3 border-t border-gray-700/50 mt-2">
-                        ${
-                          abaAtiva === "pendentes" && !isBloqueio
-                            ? `
-                        <button onclick="concluirAgendamento(${ag.id})" class="text-green-400 font-bold hover:bg-green-900/20 px-3 py-1 rounded">✅ Concluir</button>
-                        `
-                            : ""
-                        }
-                        <button onclick="deletarAgendamento(${ag.id})" class="text-red-400 font-medium hover:bg-red-900/20 px-3 py-1 rounded">
-                            🗑️ ${abaAtiva === "concluidos" ? "Apagar" : "Liberar/Cancelar"}
+                    <div class="text-xs text-gray-400 mt-1">📱 ${ag.telefone || '-'}</div>
+                </td>
+                <td class="px-4 py-3 font-medium text-gray-300">${ag.servico}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-300">✂️ ${ag.barbeiro_nome || '-'}</td>
+                <td class="px-4 py-3 text-right whitespace-nowrap">
+                    <div class="flex justify-end gap-3">
+                        ${abaAtiva === 'pendentes' && !isBloqueio ? `
+                            <button onclick="concluirAgendamento(${ag.id})" class="text-green-400 hover:text-green-300 bg-green-900/20 px-3 py-1 rounded border border-green-800 transition" title="Concluir">✅ Concluir</button>
+                        ` : ''}
+                        <button onclick="deletarAgendamento(${ag.id})" class="text-red-400 hover:text-red-300 bg-red-900/20 px-3 py-1 rounded border border-red-800 transition" title="${abaAtiva === 'concluidos' ? 'Apagar' : 'Cancelar / Liberar'}">
+                            🗑️ ${abaAtiva === 'concluidos' ? 'Apagar' : 'Liberar'}
                         </button>
                     </div>
-                </div>`;
-          })
-          .join("");
-      }
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table></div>`;
+    divLista.innerHTML = html;
+}
 
       // Lógica de 3 abas agora
       function mudarAba(aba) {
