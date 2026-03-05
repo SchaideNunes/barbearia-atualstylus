@@ -115,6 +115,9 @@ function mostrarPagina(nomePagina) {
   }
 
   window.scrollTo(0, 0);
+  if (nomePagina !== "meusAgendamentos") {
+    history.replaceState(null, null, " ");
+  }
 }
 
 document
@@ -201,6 +204,11 @@ async function confirmarAgendamento() {
     return;
   }
 
+  if (telefone.length < 15) {
+    alert("Por favor, digite um número de WhatsApp válido com o DDD.");
+    return; // Para o agendamento na hora
+  }
+
   const barbeiroId = parseInt(barbeiroRadio.value);
   const barbeiroNome =
     BARBEIROS.find((b) => b.id === barbeiroId)?.nome || "Barbeiro";
@@ -276,6 +284,9 @@ function enviarWhatsApp(agendamento) {
     agendamento.data + "T00:00:00",
   ).toLocaleDateString("pt-BR");
 
+  // ⚠️ IMPORTANTE: Substitui "seusite.com.br" pelo domínio real onde o site está hospedado
+  const linkCancelamento = `https://atualestilo.com/#meusAgendamentos`;
+
   const mensagem = `🔔 *NOVO AGENDAMENTO* 🔔
 
 👤 *Cliente:* ${agendamento.nome}
@@ -286,25 +297,36 @@ function enviarWhatsApp(agendamento) {
 ✂️ *Serviço:* ${agendamento.servico}
 💰 *Valor:* R$ ${agendamento.valor},00
 
-_Agendamento via site_`;
+⚠️ *Precisa cancelar?*
+Acesse: ${linkCancelamento}`;
 
   const url = `https://wa.me/${WHATSAPP_BARBEARIA}?text=${encodeURIComponent(mensagem)}`;
-  window.open(url, "_blank");
+  window.location.href = url;
 }
 
 function verificarStatusBotao() {
-  const nome = document.getElementById("campoNome").value.trim();
-  const telefone = document.getElementById("campoTelefone").value.trim();
-  const servico = document.getElementById("campoServico").value;
-  const data = document.getElementById("campoData").value;
-  const horario = document.getElementById("campoHorario").value;
+  const nome = document.getElementById("campoNome")?.value.trim();
+  const telefone = document.getElementById("campoTelefone")?.value.trim();
+  const servico = document.getElementById("campoServico")?.value;
+  const data = document.getElementById("campoData")?.value;
+  const horario = document.getElementById("campoHorario")?.value;
   const barbeiroSelecionado = document.querySelector(
     'input[name="barbeiro"]:checked',
   );
   const botao = document.querySelector(".botao-confirmar");
 
+  if (!botao) return;
+
+  // A MÁGICA ESTÁ AQUI: telefone.length === 15 garante que ele digitou tudo!
+  const isTelefoneValido = telefone && telefone.length === 15;
+
   const formularioCompleto =
-    nome && telefone && servico && data && horario && barbeiroSelecionado;
+    nome &&
+    isTelefoneValido &&
+    servico &&
+    data &&
+    horario &&
+    barbeiroSelecionado;
 
   if (formularioCompleto) {
     botao.disabled = false;
@@ -313,7 +335,14 @@ function verificarStatusBotao() {
     botao.style.cursor = "pointer";
   } else {
     botao.disabled = true;
-    botao.innerHTML = "Preencha tudo para confirmar";
+
+    // Muda o texto do botão para avisar o cliente do que falta
+    if (telefone && telefone.length < 15 && telefone.length > 0) {
+      botao.innerHTML = "Digite o WhatsApp completo com DDD";
+    } else {
+      botao.innerHTML = "Preencha tudo para confirmar";
+    }
+
     botao.style.opacity = "0.5";
     botao.style.cursor = "not-allowed";
   }
@@ -321,12 +350,14 @@ function verificarStatusBotao() {
 
 function aplicarMascaraTelefone(event) {
   let input = event.target;
-  let valor = input.value.replace(/\D/g, "");
+  let valor = input.value.replace(/\D/g, ""); // Remove tudo o que NÃO for número
 
+  // Limita a 11 números no máximo (DDD 2 dígitos + Número 9 dígitos)
   if (valor.length > 11) {
     valor = valor.slice(0, 11);
   }
 
+  // Aplica a formatação visual (XX) XXXXX-XXXX
   if (valor.length > 2) {
     valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
   }
@@ -335,10 +366,17 @@ function aplicarMascaraTelefone(event) {
   }
 
   input.value = valor;
-  verificarStatusBotao();
+
+  // Chama a verificação do botão toda vez que o cliente digita uma tecla
+  if (typeof verificarStatusBotao === "function") {
+    verificarStatusBotao();
+  }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  if (window.location.hash === "#meusAgendamentos") {
+    mostrarPagina("meusAgendamentos");
+  }
   const dadosSalvos = localStorage.getItem("dadosClienteBarbearia");
   if (dadosSalvos) {
     const cliente = JSON.parse(dadosSalvos);
@@ -389,39 +427,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Função para o cliente buscar os seus agendamentos
 async function buscarMeusAgendamentos() {
-    const telefoneInput = document.getElementById('buscaTelefoneCliente').value;
-    const divLista = document.getElementById('listaMeusAgendamentos');
-    
-    if (telefoneInput.length < 14) {
-        alert("Por favor, insira um número de WhatsApp válido.");
-        return;
+  const telefoneInput = document.getElementById("buscaTelefoneCliente").value;
+  const divLista = document.getElementById("listaMeusAgendamentos");
+
+  if (telefoneInput.length < 14) {
+    alert("Por favor, insira um número de WhatsApp válido.");
+    return;
+  }
+
+  divLista.innerHTML =
+    '<p class="texto-info-horario text-center">Buscando...</p>';
+
+  try {
+    const hoje = new Date().toISOString().split("T")[0];
+
+    // Procura agendamentos do cliente que sejam de hoje em diante e estejam confirmados
+    const { data: agendamentos, error } = await supabaseClient
+      .from("agendamentos")
+      .select("*")
+      .eq("telefone", telefoneInput)
+      .eq("status", "confirmado")
+      .gte("data_agendamento", hoje)
+      .order("data_agendamento", { ascending: true });
+
+    if (error) throw error;
+
+    if (agendamentos.length === 0) {
+      divLista.innerHTML =
+        '<p class="texto-info-horario text-center" style="color: #fca5a5;">Nenhum agendamento pendente encontrado para este número.</p>';
+      return;
     }
 
-    divLista.innerHTML = '<p class="texto-info-horario text-center">Buscando...</p>';
-
-    try {
-        const hoje = new Date().toISOString().split('T')[0];
-        
-        // Procura agendamentos do cliente que sejam de hoje em diante e estejam confirmados
-        const { data: agendamentos, error } = await supabaseClient
-            .from('agendamentos')
-            .select('*')
-            .eq('telefone', telefoneInput)
-            .eq('status', 'confirmado')
-            .gte('data_agendamento', hoje)
-            .order('data_agendamento', { ascending: true });
-
-        if (error) throw error;
-
-        if (agendamentos.length === 0) {
-            divLista.innerHTML = '<p class="texto-info-horario text-center" style="color: #fca5a5;">Nenhum agendamento pendente encontrado para este número.</p>';
-            return;
-        }
-
-        // Desenha os cards para o cliente
-        divLista.innerHTML = agendamentos.map(ag => {
-            const dataBR = new Date(ag.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR');
-            return `
+    // Desenha os cards para o cliente
+    divLista.innerHTML = agendamentos
+      .map((ag) => {
+        const dataBR = new Date(
+          ag.data_agendamento + "T00:00:00",
+        ).toLocaleDateString("pt-BR");
+        return `
             <div style="background-color: #1f2937; border: 1px solid #374151; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
                 <h4 style="color: #fbbf24; margin-bottom: 10px; font-weight: bold;">${ag.servico}</h4>
                 <p style="color: #d1d5db; font-size: 0.9rem; margin-bottom: 5px;">📅 Data: <strong>${dataBR}</strong> às <strong>${ag.horario}</strong></p>
@@ -431,31 +474,35 @@ async function buscarMeusAgendamentos() {
                 </button>
             </div>
             `;
-        }).join('');
-
-    } catch (err) {
-        divLista.innerHTML = `<p style="color: red; text-align: center;">Erro na busca: ${err.message}</p>`;
-    }
+      })
+      .join("");
+  } catch (err) {
+    divLista.innerHTML = `<p style="color: red; text-align: center;">Erro na busca: ${err.message}</p>`;
+  }
 }
 
 // Função para o cliente cancelar o agendamento
 async function cancelarAgendamentoCliente(id) {
-    if(!confirm("Tem certeza que deseja cancelar este agendamento? O horário será liberado imediatamente.")) return;
-    
-    try {
-        // Altera o status para 'cancelado' (assim libera o horário no calendário)
-        const { error } = await supabaseClient
-            .from('agendamentos')
-            .update({ status: 'cancelado' })
-            .eq('id', id);
+  if (
+    !confirm(
+      "Tem certeza que deseja cancelar este agendamento? O horário será liberado imediatamente.",
+    )
+  )
+    return;
 
-        if (error) throw error;
+  try {
+    // Altera o status para 'cancelado' (assim libera o horário no calendário)
+    const { error } = await supabaseClient
+      .from("agendamentos")
+      .update({ status: "cancelado" })
+      .eq("id", id);
 
-        alert("✅ Agendamento cancelado com sucesso!");
-        // Atualiza a lista
-        buscarMeusAgendamentos(); 
-        
-    } catch (err) {
-        alert("Erro ao tentar cancelar: " + err.message);
-    }
+    if (error) throw error;
+
+    alert("✅ Agendamento cancelado com sucesso!");
+    // Atualiza a lista
+    buscarMeusAgendamentos();
+  } catch (err) {
+    alert("Erro ao tentar cancelar: " + err.message);
+  }
 }
