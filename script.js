@@ -483,26 +483,48 @@ async function buscarMeusAgendamentos() {
 
 // Função para o cliente cancelar o agendamento
 async function cancelarAgendamentoCliente(id) {
-  if (
-    !confirm(
-      "Tem certeza que deseja cancelar este agendamento? O horário será liberado imediatamente.",
-    )
-  )
-    return;
+    if(!confirm("Tem certeza que deseja cancelar este agendamento? O horário será liberado imediatamente.")) return;
+    
+    try {
+        // 1. Primeiro, buscamos os dados do agendamento para montar a mensagem
+        const { data: agendamento, error: erroBusca } = await supabaseClient
+            .from('agendamentos')
+            .select('*')
+            .eq('id', id)
+            .single();
 
-  try {
-    // Altera o status para 'cancelado' (assim libera o horário no calendário)
-    const { error } = await supabaseClient
-      .from("agendamentos")
-      .update({ status: "cancelado" })
-      .eq("id", id);
+        if (erroBusca) throw erroBusca;
 
-    if (error) throw error;
+        // 2. Atualizamos o status para 'cancelado' no banco de dados
+        const { error: erroUpdate } = await supabaseClient
+            .from('agendamentos')
+            .update({ status: 'cancelado' })
+            .eq('id', id);
 
-    alert("✅ Agendamento cancelado com sucesso!");
-    // Atualiza a lista
-    buscarMeusAgendamentos();
-  } catch (err) {
-    alert("Erro ao tentar cancelar: " + err.message);
-  }
+        if (erroUpdate) throw erroUpdate;
+
+        // 3. Atualiza a tela para o cliente ver que sumiu
+        alert("✅ Agendamento cancelado com sucesso!");
+        buscarMeusAgendamentos(); 
+        
+        // 4. Monta a mensagem e envia para o WhatsApp do Barbeiro
+        const dataFormatada = new Date(agendamento.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR');
+        
+        const mensagem = `❌ *AGENDAMENTO CANCELADO* ❌
+        
+Olá, acabei de cancelar o meu agendamento pelo site.
+
+👤 *Cliente:* ${agendamento.nome}
+👨‍💼 *Barbeiro:* ${agendamento.barbeiro_nome}
+📅 *Data:* ${dataFormatada}
+🕐 *Horário:* ${agendamento.horario}
+✂️ *Serviço:* ${agendamento.servico}`;
+
+        // Redireciona para o WhatsApp (usa a mesma variável do agendamento)
+        const url = `https://wa.me/${WHATSAPP_BARBEARIA}?text=${encodeURIComponent(mensagem)}`;
+        window.location.href = url;
+        
+    } catch (err) {
+        alert("Erro ao tentar cancelar: " + err.message);
+    }
 }
