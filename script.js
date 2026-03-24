@@ -62,7 +62,24 @@ async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
     }
 
     const horariosOcupados = agendamentos.map((ag) => ag.horario);
-    return listaHorariosDoBarbeiro.filter((h) => !horariosOcupados.includes(h));
+    let horariosLivres = listaHorariosDoBarbeiro.filter((h) => !horariosOcupados.includes(h));
+
+    const dataLocal = new Date();
+    const ano = dataLocal.getFullYear();
+    const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
+    const dia = String(dataLocal.getDate()).padStart(2, '0');
+    const hojeStr = `${ano}-${mes}-${dia}`;
+
+    if (dataSelecionada === hojeStr) {
+      const horaAtual = dataLocal.getHours();
+      const minAtual = dataLocal.getMinutes();
+      horariosLivres = horariosLivres.filter((h) => {
+        const [hSlot, mSlot] = h.split(':').map(Number);
+        return hSlot > horaAtual || (hSlot === horaAtual && mSlot > minAtual);
+      });
+    }
+
+    return horariosLivres;
   } catch (err) {
     console.error(err);
     return listaHorariosDoBarbeiro;

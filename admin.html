@@ -126,6 +126,7 @@
               type="date"
               id="adminData"
               class="flex-1 bg-gray-900 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none"
+              onchange="carregarHorariosAdmin()"
             />
             <select
               id="adminHorario"
@@ -394,7 +395,27 @@
         const container = document.getElementById("gridHorarios");
         container.innerHTML = "";
 
-        TODOS_HORARIOS.forEach((horario) => {
+        const dataSelecionada = document.getElementById("adminData").value;
+        let horarios = TODOS_HORARIOS;
+
+        if (dataSelecionada) {
+          const dataLocal = new Date();
+          const ano = dataLocal.getFullYear();
+          const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
+          const dia = String(dataLocal.getDate()).padStart(2, '0');
+          const hojeStr = `${ano}-${mes}-${dia}`;
+
+          if (dataSelecionada === hojeStr) {
+            const horaAtual = dataLocal.getHours();
+            const minAtual = dataLocal.getMinutes();
+            horarios = horarios.filter((h) => {
+              const [hSlot, mSlot] = h.split(':').map(Number);
+              return hSlot > horaAtual || (hSlot === horaAtual && mSlot > minAtual);
+            });
+          }
+        }
+
+        horarios.forEach((horario) => {
           const isOcupado = ocupados.includes(horario);
           const btn = document.createElement("button");
           btn.innerText = horario;
@@ -789,8 +810,29 @@
 
       function carregarHorariosAdmin() {
         const select = document.getElementById("adminHorario");
+        const dataSelecionada = document.getElementById("adminData").value;
         select.innerHTML = '<option value="">Horário</option>';
-        TODOS_HORARIOS.forEach((h) => {
+        
+        let horarios = TODOS_HORARIOS;
+
+        if (dataSelecionada) {
+          const dataLocal = new Date();
+          const ano = dataLocal.getFullYear();
+          const mes = String(dataLocal.getMonth() + 1).padStart(2, '0');
+          const dia = String(dataLocal.getDate()).padStart(2, '0');
+          const hojeStr = `${ano}-${mes}-${dia}`;
+
+          if (dataSelecionada === hojeStr) {
+            const horaAtual = dataLocal.getHours();
+            const minAtual = dataLocal.getMinutes();
+            horarios = horarios.filter((h) => {
+              const [hSlot, mSlot] = h.split(':').map(Number);
+              return hSlot > horaAtual || (hSlot === horaAtual && mSlot > minAtual);
+            });
+          }
+        }
+
+        horarios.forEach((h) => {
           const opt = document.createElement("option");
           opt.value = h;
           opt.innerText = h;
