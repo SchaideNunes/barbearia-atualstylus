@@ -99,9 +99,16 @@
         >
           🚫 Bloqueios
         </button>
+        <button
+          id="btnConfig"
+          onclick="mudarAba('config')"
+          class="flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
+        >
+          ⚙️ Config
+        </button>
       </div>
 
-      <div
+      <div id="painelAcoes"
         class="bg-gray-800 p-5 rounded-lg border border-gray-600 mb-6 shadow-lg"
       >
         <h3 class="text-white font-bold mb-4 flex items-center gap-2">
@@ -197,7 +204,7 @@
         </div>
       </div>
 
-      <div
+      <div id="painelFiltros"
         class="bg-gray-800 p-4 rounded-lg border border-gray-700 mb-6 shadow-md"
       >
         <div class="flex items-center justify-between mb-3">
@@ -238,6 +245,31 @@
           >
             Limpar
           </button>
+        </div>
+      </div>
+
+      <div id="painelConfig" class="hidden bg-gray-800 p-6 rounded-lg border border-gray-600 mb-6 shadow-lg fade-in">
+        <h3 class="text-white font-bold mb-4 flex items-center gap-2 text-xl border-b border-gray-700 pb-2">⚙️ Configurar Horários</h3>
+        <p class="text-sm text-gray-400 mb-4">Escolha o barbeiro para gerenciar seus horários de atendimento.</p>
+        
+        <select id="configBarbeiroSelect" class="w-full md:w-1/2 bg-gray-900 border border-gray-600 rounded p-3 text-white focus:border-yellow-500 outline-none mb-6" onchange="carregarConfigHorariosUI()">
+          <option value="">Selecione o Barbeiro</option>
+          <option value="1">Geilson</option>
+          <option value="2">Denilson</option>
+        </select>
+        
+        <div id="areaEdicaoConfig" class="hidden">
+          <div class="flex flex-wrap items-center gap-2 mb-4 p-4 bg-gray-900 rounded border border-gray-700">
+            <span class="text-gray-300 font-bold shrink-0">Novo:</span>
+            <input type="time" id="novoHorarioConfig" class="bg-gray-800 border border-gray-600 rounded p-2 text-sm text-white focus:border-yellow-500 outline-none">
+            <button onclick="adicionarHorarioConfig()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold transition">Adicionar</button>
+          </div>
+          <p class="text-xs text-yellow-500 mb-2 font-mono">Clique em um horário para removê-lo.</p>
+          <div id="listaHorariosConfig" class="flex flex-wrap gap-2 mb-6 max-h-[300px] overflow-y-auto"></div>
+          
+          <div class="border-t border-gray-700 pt-4 flex justify-end">
+            <button onclick="salvarConfigHorarios()" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold text-sm transition">💾 Salvar no Banco</button>
+          </div>
         </div>
       </div>
 
@@ -303,29 +335,12 @@
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHRpaWNzaGV2dXhranNua21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQwMzQsImV4cCI6MjA4NjQyMDAzNH0.7otLzZqWwzV1PUQCxrC9k-Y-KZ--QrQVVYllZKSFans";
       const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      const TODOS_HORARIOS = [
-        "08:30",
-        "09:00",
-        "09:30",
-        "10:00",
-        "10:30",
-        "11:00",
-        "11:30",
-        "12:00",
-        "12:30",
-        "13:00",
-        "13:30",
-        "14:00",
-        "14:30",
-        "15:00",
-        "15:30",
-        "16:00",
-        "16:30",
-        "17:00",
-        "17:30",
-        "18:00",
-        "18:30",
-      ];
+      // Fallback arrays (mesma lógica do front-end)
+      const PADRAO_HORARIOS_GEILSON = ["08:30", "09:30", "10:00", "11:00", "14:00", "14:30", "15:30", "16:00", "17:00", "17:30", "18:00", "18:30"];
+      const PADRAO_HORARIOS_DENILSON = ["08:30", "09:30", "10:00", "11:00", "14:00", "14:30", "15:30", "16:00", "17:00"];
+      
+      let CACHE_HORARIOS_BARBEIROS = { 1: [], 2: [] };
+      let horariosEdicaoAtual = [];
 
       let cacheAgendamentos = [];
       let abaAtiva = "pendentes"; // 'pendentes', 'concluidos', 'bloqueios'
@@ -342,6 +357,7 @@
             window.location.href = "login.html";
             return;
           }
+          await carregarConfigDB();
           carregarHorariosAdmin();
           const { data: agendamentos, error: dbError } = await supabaseClient
             .from("agendamentos")
@@ -396,7 +412,11 @@
         container.innerHTML = "";
 
         const dataSelecionada = document.getElementById("adminData").value;
-        let horarios = TODOS_HORARIOS;
+        const barbeiroId = parseInt(document.getElementById("adminBarbeiro").value);
+        
+        if (!barbeiroId) return;
+
+        let horarios = [...(CACHE_HORARIOS_BARBEIROS[barbeiroId] || [])];
 
         if (dataSelecionada) {
           const dataLocal = new Date();
@@ -608,15 +628,16 @@
         divLista.innerHTML = html;
       }
 
-      // Lógica de 3 abas agora
+      // Lógica de abas
       function mudarAba(aba) {
         abaAtiva = aba;
         const btnP = document.getElementById("btnPendentes");
         const btnC = document.getElementById("btnConcluidos");
         const btnB = document.getElementById("btnBloqueios");
+        const btnCfg = document.getElementById("btnConfig");
 
         // Reseta cores
-        [btnP, btnC, btnB].forEach(
+        [btnP, btnC, btnB, btnCfg].forEach(
           (b) =>
             (b.className =
               "flex-1 py-3 rounded-lg font-bold text-sm transition border border-gray-600 bg-gray-800 text-gray-400 hover:bg-gray-700"),
@@ -631,8 +652,26 @@
         if (aba === "bloqueios")
           btnB.className =
             "flex-1 py-3 rounded-lg font-bold text-sm transition border border-red-600 bg-red-600/20 text-red-500";
+        if (aba === "config")
+          btnCfg.className = "flex-1 py-3 rounded-lg font-bold text-sm transition border border-yellow-600 bg-yellow-600/20 text-yellow-500";
 
-        aplicarFiltros();
+        const painelAcoes = document.getElementById("painelAcoes");
+        const painelFiltros = document.getElementById("painelFiltros");
+        const listaAgendamentos = document.getElementById("listaAgendamentos");
+        const painelConfig = document.getElementById("painelConfig");
+
+        if (aba === "config") {
+          if(painelAcoes) painelAcoes.classList.add("hidden");
+          if(painelFiltros) painelFiltros.classList.add("hidden");
+          if(listaAgendamentos) listaAgendamentos.classList.add("hidden");
+          if(painelConfig) painelConfig.classList.remove("hidden");
+        } else {
+          if(painelAcoes) painelAcoes.classList.remove("hidden");
+          if(painelFiltros) painelFiltros.classList.remove("hidden");
+          if(listaAgendamentos) listaAgendamentos.classList.remove("hidden");
+          if(painelConfig) painelConfig.classList.add("hidden");
+          aplicarFiltros();
+        }
       }
 
       function aplicarFiltros() {
@@ -811,9 +850,13 @@
       function carregarHorariosAdmin() {
         const select = document.getElementById("adminHorario");
         const dataSelecionada = document.getElementById("adminData").value;
+        const barbeiroId = parseInt(document.getElementById("adminBarbeiro").value);
+        
         select.innerHTML = '<option value="">Horário</option>';
         
-        let horarios = TODOS_HORARIOS;
+        if (!barbeiroId) return; // Só carrega se tiver barbeiro
+
+        let horarios = [...(CACHE_HORARIOS_BARBEIROS[barbeiroId] || [])];
 
         if (dataSelecionada) {
           const dataLocal = new Date();
@@ -843,6 +886,94 @@
       async function sair() {
         await supabaseClient.auth.signOut();
         window.location.href = "login.html";
+      }
+
+      async function carregarConfigDB() {
+        try {
+          const { data: configDados, error } = await supabaseClient
+            .from("barbeiros_config")
+            .select("*");
+          
+          if (!error && configDados && configDados.length > 0) {
+            configDados.forEach(cfg => {
+              CACHE_HORARIOS_BARBEIROS[cfg.id] = cfg.horarios;
+            });
+          } else {
+            throw new Error("Tabela vazia ou erro supabase");
+          }
+        } catch (err) {
+          CACHE_HORARIOS_BARBEIROS[1] = PADRAO_HORARIOS_GEILSON;
+          CACHE_HORARIOS_BARBEIROS[2] = PADRAO_HORARIOS_DENILSON;
+        }
+      }
+
+      function carregarConfigHorariosUI() {
+        const select = document.getElementById("configBarbeiroSelect").value;
+        const area = document.getElementById("areaEdicaoConfig");
+        
+        if (!select) {
+          area.classList.add("hidden");
+          return;
+        }
+        
+        area.classList.remove("hidden");
+        const id = parseInt(select);
+        horariosEdicaoAtual = [...(CACHE_HORARIOS_BARBEIROS[id] || [])];
+        renderizarHorariosConfig();
+      }
+
+      function renderizarHorariosConfig() {
+        const container = document.getElementById("listaHorariosConfig");
+        container.innerHTML = "";
+        
+        horariosEdicaoAtual.sort();
+        
+        horariosEdicaoAtual.forEach(h => {
+          const btn = document.createElement("button");
+          btn.innerText = "❌ " + h;
+          btn.className = "bg-gray-700 hover:bg-red-900 border border-gray-600 text-white px-3 py-1.5 rounded transition text-sm font-mono";
+          btn.onclick = () => {
+            if(confirm('Remover horário ' + h + '?')) {
+              horariosEdicaoAtual = horariosEdicaoAtual.filter(x => x !== h);
+              renderizarHorariosConfig();
+            }
+          };
+          container.appendChild(btn);
+        });
+      }
+
+      function adicionarHorarioConfig() {
+        let val = document.getElementById("novoHorarioConfig").value;
+        if (!val) return alert("Digite um horário válido");
+        
+        if (!horariosEdicaoAtual.includes(val)) {
+          horariosEdicaoAtual.push(val);
+          document.getElementById("novoHorarioConfig").value = "";
+          renderizarHorariosConfig();
+        } else {
+          alert("Este horário já existe na lista!");
+        }
+      }
+
+      async function salvarConfigHorarios() {
+        const id = parseInt(document.getElementById("configBarbeiroSelect").value);
+        if (!id) return;
+        
+        horariosEdicaoAtual.sort();
+        
+        try {
+          const { error } = await supabaseClient
+            .from("barbeiros_config")
+            .upsert([{ id: id, horarios: horariosEdicaoAtual }]);
+            
+          if (error) throw error;
+          
+          alert("✅ Horários salvos com sucesso!");
+          CACHE_HORARIOS_BARBEIROS[id] = [...horariosEdicaoAtual];
+          carregarHorariosAdmin(); 
+        } catch(err) {
+          alert("Erro ao salvar (Você já criou a tabela no Supabase?): " + err.message);
+        }
       }
 
       iniciarAdmin();

@@ -11,32 +11,10 @@ const BARBEIROS = [
   { id: 2, nome: "Denilson", foto: "assets/Denilson.jpg" },
 ];
 
-const HORARIOS_GEILSON = [
-  "08:30",
-  "09:30",
-  "10:00",
-  "11:00",
-  "14:00",
-  "14:30",
-  "15:30",
-  "16:00",
-  "17:00",
-  "17:30",
-  "18:00",
-  "18:30",
-];
+const PADRAO_HORARIOS_GEILSON = ["08:30", "09:30", "10:00", "11:00", "14:00", "14:30", "15:30", "16:00", "17:00", "17:30", "18:00", "18:30"];
+const PADRAO_HORARIOS_DENILSON = ["08:30", "09:30", "10:00", "11:00", "14:00", "14:30", "15:30", "16:00", "17:00"];
 
-const HORARIOS_DENILSON = [
-  "08:30",
-  "09:30",
-  "10:00",
-  "11:00",
-  "14:00",
-  "14:30",
-  "15:30",
-  "16:00",
-  "17:00",
-];
+let cacheConfigHorarios = {};
 
 async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
   if (!barbeiroId || !dataSelecionada) return [];
@@ -44,9 +22,28 @@ async function verificarHorariosDisponiveis(dataSelecionada, barbeiroId) {
   const id = parseInt(barbeiroId);
   let listaHorariosDoBarbeiro = [];
 
-  if (id === 1) listaHorariosDoBarbeiro = HORARIOS_GEILSON;
-  else if (id === 2) listaHorariosDoBarbeiro = HORARIOS_DENILSON;
-  else return [];
+  try {
+    if (cacheConfigHorarios[id]) {
+        listaHorariosDoBarbeiro = cacheConfigHorarios[id];
+    } else {
+        const { data: configDados, error: errConfig } = await supabaseClient
+            .from("barbeiros_config")
+            .select("horarios")
+            .eq("id", id)
+            .single();
+            
+        if (!errConfig && configDados && configDados.horarios) {
+            listaHorariosDoBarbeiro = configDados.horarios;
+            cacheConfigHorarios[id] = listaHorariosDoBarbeiro;
+        } else {
+            throw new Error("Usando fallback de horários");
+        }
+    }
+  } catch (err) {
+      if (id === 1) listaHorariosDoBarbeiro = PADRAO_HORARIOS_GEILSON;
+      else if (id === 2) listaHorariosDoBarbeiro = PADRAO_HORARIOS_DENILSON;
+      else return [];
+  }
 
   try {
     const { data: agendamentos, error } = await supabaseClient
