@@ -210,9 +210,18 @@ async function atualizarHorariosDisponiveis() {
   verificarStatusBotao();
 }
 
+function sanitizar(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML;
+}
+
 async function confirmarAgendamento() {
-  const nome = document.getElementById("campoNome").value;
-  const telefone = document.getElementById("campoTelefone").value;
+  const nomeRaw = document.getElementById("campoNome").value;
+  const telefoneRaw = document.getElementById("campoTelefone").value;
+  
+  const nome = sanitizar(nomeRaw);
+  const telefone = sanitizar(telefoneRaw);
   const servico = document.getElementById("campoServico").value;
   const barbeiroRadio = document.querySelector(
     'input[name="barbeiro"]:checked',
