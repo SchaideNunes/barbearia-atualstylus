@@ -368,7 +368,11 @@
           if (dbError) throw dbError;
           cacheAgendamentos = agendamentos;
           aplicarFiltros();
+          
+          // MOSTRAR A PÁGINA APÓS TUDO CARREGAR
+          document.body.classList.remove("opacity-0");
         } catch (err) {
+          document.body.classList.remove("opacity-0");
           lista.innerHTML = `<p class="text-red-500 text-center">Erro: ${err.message}</p>`;
         }
       }
