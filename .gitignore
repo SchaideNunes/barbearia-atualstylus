@@ -1,0 +1,8 @@
+# Configurações sensíveis
+supabase-config.js
+
+# Pastas de sistema e logs
+.DS_Store
+node_modules/
+.env
+*.log

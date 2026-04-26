@@ -1,6 +1,5 @@
-const SUPABASE_URL = "https://tnltiicshevuxkjsnkmm.supabase.co";
-const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHRpaWNzaGV2dXhranNua21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQwMzQsImV4cCI6MjA4NjQyMDAzNH0.7otLzZqWwzV1PUQCxrC9k-Y-KZ--QrQVVYllZKSFans";
+const SUPABASE_URL = CONFIG_SUPABASE.URL;
+const SUPABASE_KEY = CONFIG_SUPABASE.KEY;
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -165,6 +164,15 @@ async function atualizarHorariosDisponiveis() {
 
   const dataSelecionada = campoData.value;
   const barbeiroId = barbeiroRadio ? barbeiroRadio.value : null;
+
+  if (dataSelecionada) {
+    const dataObj = new Date(dataSelecionada + "T00:00:00");
+    if (dataObj.getDay() === 0) {
+      campoHorario.innerHTML = '<option value="">Domingo não há funcionamento</option>';
+      campoHorario.disabled = true;
+      return;
+    }
+  }
 
   campoHorario.innerHTML = '<option value="">Carregando...</option>';
   campoHorario.disabled = true;
@@ -404,7 +412,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const hoje = new Date().toISOString().split("T")[0];
     campoData.min = hoje;
     campoData.value = hoje;
-    campoData.addEventListener("change", atualizarHorariosDisponiveis);
+    
+    campoData.addEventListener("change", function() {
+        const dataSelecionada = new Date(this.value + "T00:00:00");
+        const diaSemana = dataSelecionada.getDay(); // 0 = Domingo
+
+        if (diaSemana === 0) {
+            alert("A barbearia não funciona aos domingos. Por favor, escolha outra data.");
+            this.value = "";
+            const campoHorario = document.getElementById("campoHorario");
+            if (campoHorario) {
+                campoHorario.innerHTML = '<option value="">Selecione outra data</option>';
+            }
+        } else {
+            atualizarHorariosDisponiveis();
+        }
+    });
   }
 
   const campoTelefone = document.getElementById("campoTelefone");
