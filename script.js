@@ -165,6 +165,15 @@ async function atualizarHorariosDisponiveis() {
   const dataSelecionada = campoData.value;
   const barbeiroId = barbeiroRadio ? barbeiroRadio.value : null;
 
+  if (dataSelecionada) {
+    const dataObj = new Date(dataSelecionada + "T00:00:00");
+    if (dataObj.getDay() === 0) {
+      campoHorario.innerHTML = '<option value="">Domingo não há funcionamento</option>';
+      campoHorario.disabled = true;
+      return;
+    }
+  }
+
   campoHorario.innerHTML = '<option value="">Carregando...</option>';
   campoHorario.disabled = true;
 
@@ -201,9 +210,18 @@ async function atualizarHorariosDisponiveis() {
   verificarStatusBotao();
 }
 
+function sanitizar(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML;
+}
+
 async function confirmarAgendamento() {
-  const nome = document.getElementById("campoNome").value;
-  const telefone = document.getElementById("campoTelefone").value;
+  const nomeRaw = document.getElementById("campoNome").value;
+  const telefoneRaw = document.getElementById("campoTelefone").value;
+  
+  const nome = sanitizar(nomeRaw);
+  const telefone = sanitizar(telefoneRaw);
   const servico = document.getElementById("campoServico").value;
   const barbeiroRadio = document.querySelector(
     'input[name="barbeiro"]:checked',
@@ -403,7 +421,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const hoje = new Date().toISOString().split("T")[0];
     campoData.min = hoje;
     campoData.value = hoje;
-    campoData.addEventListener("change", atualizarHorariosDisponiveis);
+    
+    campoData.addEventListener("change", function() {
+        const dataSelecionada = new Date(this.value + "T00:00:00");
+        const diaSemana = dataSelecionada.getDay(); // 0 = Domingo
+
+        if (diaSemana === 0) {
+            alert("A barbearia não funciona aos domingos. Por favor, escolha outra data.");
+            this.value = "";
+            const campoHorario = document.getElementById("campoHorario");
+            if (campoHorario) {
+                campoHorario.innerHTML = '<option value="">Selecione outra data</option>';
+            }
+        } else {
+            atualizarHorariosDisponiveis();
+        }
+    });
   }
 
   const campoTelefone = document.getElementById("campoTelefone");
