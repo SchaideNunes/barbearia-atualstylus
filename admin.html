@@ -359,11 +359,17 @@
           }
           await carregarConfigDB();
           carregarHorariosAdmin();
+          const dLimite = new Date();
+          dLimite.setDate(dLimite.getDate() - 15); // Pega de 15 dias atrás em diante para não lotar a memória
+          const dataLimite = dLimite.getFullYear() + "-" + String(dLimite.getMonth() + 1).padStart(2, "0") + "-" + String(dLimite.getDate()).padStart(2, "0");
+
           const { data: agendamentos, error: dbError } = await supabaseClient
             .from("agendamentos")
             .select("*")
+            .gte("data_agendamento", dataLimite)
             .order("data_agendamento", { ascending: true })
-            .order("horario", { ascending: true });
+            .order("horario", { ascending: true })
+            .limit(5000);
 
           if (dbError) throw dbError;
           cacheAgendamentos = agendamentos;
