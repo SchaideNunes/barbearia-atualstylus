@@ -1,13 +1,11 @@
-<<<<<<< HEAD
-.env
-supabase-config.js
-=======
 # Configurações sensíveis
+.env
 supabase-config.js
 
 # Pastas de sistema e logs
 .DS_Store
 node_modules/
-.env
 *.log
->>>>>>> ff08785901e887908deb6fede8d0797dfd2f5741
+
+# Documentação interna
+GEMINI.md
