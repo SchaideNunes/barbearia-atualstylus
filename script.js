@@ -331,7 +331,12 @@ function enviarWhatsApp(agendamento) {
 ⚠️ *Precisa cancelar?*
 Acesse: ${linkCancelamento}`;
 
-  const url = `https://wa.me/${WHATSAPP_BARBEARIA}?text=${encodeURIComponent(mensagem)}`;
+  let numeroWhatsapp = WHATSAPP_BARBEARIA;
+  if (agendamento.barbeiroNome === "Denilson") {
+    numeroWhatsapp = "5575991073283";
+  }
+
+  const url = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(mensagem)}`;
   window.location.href = url;
 }
 
@@ -566,8 +571,13 @@ Olá, acabei de cancelar o meu agendamento pelo site.
 🕐 *Horário:* ${agendamento.horario}
 ✂️ *Serviço:* ${agendamento.servico}`;
 
+        let numeroWhatsapp = WHATSAPP_BARBEARIA;
+        if (agendamento.barbeiro_nome === "Denilson") {
+            numeroWhatsapp = "5575991073283";
+        }
+
         // Redireciona para o WhatsApp (usa a mesma variável do agendamento)
-        const url = `https://wa.me/${WHATSAPP_BARBEARIA}?text=${encodeURIComponent(mensagem)}`;
+        const url = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(mensagem)}`;
         window.location.href = url;
         
     } catch (err) {
